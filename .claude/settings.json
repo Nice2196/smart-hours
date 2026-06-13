@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Read",
+      "Write(/Volumes/macSdcard/AICoding/tmp_try/*)",
+      "Edit(/Volumes/macSdcard/AICoding/tmp_try/*)",
+      "Glob(/Volumes/macSdcard/AICoding/tmp_try/*)",
+      "Grep(/Volumes/macSdcard/AICoding/tmp_try/*)",
+      "WebFetch",
+      "WebSearch"
+    ],
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": [
+      "/Volumes/macSdcard/AICoding/tmp_try"
+    ]
+  },
+  "language": "zh-CN"
+}
