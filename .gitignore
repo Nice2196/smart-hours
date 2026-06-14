@@ -9,3 +9,5 @@ Thumbs.db
 
 # IDE
 .vscode/
+__pycache__/
+.pytest_cache/
