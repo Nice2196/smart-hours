@@ -46,12 +46,33 @@
 | 5.测试 | `python-testing` | `/verify` | Review 通过后写测试 |
 | 6.发布 | `git-flow-branch-creator` `conventional-commit` | `changelog-generator` `devops-engineer` `gh-fix-ci` | 测试通过后提交&部署 |
 
-### 自动化 Hooks
+### 自动化 Hooks（已配置）
 
-- **Write/Edit .py 文件后**: 自动 `ruff check --fix` + `ruff format`
-- **git commit 前**: 验证 Conventional Commit 格式（不合规则阻断）
-- **git push 到 main/master**: 阻断并提示使用 PR 工作流
-- **会话结束**: 检测变更，提醒 Review→Test→Commit 闭环
+| Hook | 触发时机 | 行为 |
+|------|---------|------|
+| PostToolUse (Write\|Edit) | 写入 .py 文件后 | 自动 `ruff check --fix` + `ruff format` |
+| PreToolUse (Bash git commit) | git commit 执行前 | 验证 Conventional Commit 格式，不合规则阻断 |
+| PreToolUse (Bash git push) | git push 到 main/master | 警告但允许（个人项目） |
+| **Stop (会话结束)** | **每次会话结束** | **💾 自动保存点: 检测变更 → pytest → conventional commit → push** |
+
+### 自动保存点流程 (auto-savepoint.py)
+
+```
+会话结束
+  ├→ 检测 git diff（过滤 .claude/ 内部文件 + .pyc）
+  ├→ .py 文件变更？ → 运行 pytest
+  │   ├→ 测试失败 → ❌ 跳过提交，打印失败摘要
+  │   └→ 测试通过 → 继续
+  ├→ 自动分类 commit 类型 (feat/fix/docs/chore/refactor/test)
+  ├→ 生成 Conventional Commit message
+  ├→ git add -A + git commit
+  └→ git push origin <current-branch>
+```
+
+**关键规则**：
+- 每次会话结束，代码自动存档到 GitHub，无需手动操作
+- 测试失败时会阻断提交，告知失败原因
+- Commit 类型自动推断（修改文件类型 + diff 关键词）
 
 ### 子Agent 调用规范
 
