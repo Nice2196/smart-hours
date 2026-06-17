@@ -26,10 +26,10 @@
  */
 
 const cloud = require('wx-server-sdk')
-const { getDB } = require('../common/db')
-const { requireOpenID } = require('../common/auth')
-const { BUSINESS } = require('../common/constants')
-const { logError } = require('../common/logger')
+const { getDB } = require('./common/db')
+const { requireOpenID } = require('./common/auth')
+const { BUSINESS } = require('./common/constants')
+const { logError } = require('./common/logger')
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV

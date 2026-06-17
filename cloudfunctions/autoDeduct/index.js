@@ -43,9 +43,9 @@
  */
 
 const cloud = require('wx-server-sdk')
-const { getDB } = require('../common/db')
-const { tryGetOpenID } = require('../common/auth')
-const { tryAcquireLockNonTx } = require('../common/idempotency')
+const { getDB } = require('./common/db')
+const { tryGetOpenID } = require('./common/auth')
+const { tryAcquireLockNonTx } = require('./common/idempotency')
 const {
   COURSE_STATUS,
   DEDUCTION_TYPE,
@@ -53,8 +53,8 @@ const {
   TARGET_TYPE,
   TRIGGER_TYPE,
   BUSINESS
-} = require('../common/constants')
-const { logInfo, logWarn, logError, logDeductionFailure } = require('../common/logger')
+} = require('./common/constants')
+const { logInfo, logWarn, logError, logDeductionFailure } = require('./common/logger')
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV,

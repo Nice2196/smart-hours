@@ -19,15 +19,15 @@
  */
 
 const cloud = require('wx-server-sdk')
-const { getDB } = require('../common/db')
-const { requireOpenID, injectOpenID, injectOpenIDToData } = require('../common/auth')
+const { getDB } = require('./common/db')
+const { requireOpenID, injectOpenID, injectOpenIDToData } = require('./common/auth')
 const {
   SCHEDULE_STATUS,
   ACTION_TYPES,
   TARGET_TYPE,
   TRIGGER_TYPE
-} = require('../common/constants')
-const { logInfo, logError } = require('../common/logger')
+} = require('./common/constants')
+const { logInfo, logError } = require('./common/logger')
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV

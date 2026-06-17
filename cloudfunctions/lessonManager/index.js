@@ -23,8 +23,8 @@
  */
 
 const cloud = require('wx-server-sdk')
-const { getDB } = require('../common/db')
-const { requireOpenID, injectOpenID, injectOpenIDToData } = require('../common/auth')
+const { getDB } = require('./common/db')
+const { requireOpenID, injectOpenID, injectOpenIDToData } = require('./common/auth')
 const {
   COURSE_STATUS,
   LESSON_STATUS,
@@ -33,8 +33,8 @@ const {
   TARGET_TYPE,
   TRIGGER_TYPE,
   BUSINESS
-} = require('../common/constants')
-const { logInfo, logError } = require('../common/logger')
+} = require('./common/constants')
+const { logInfo, logError } = require('./common/logger')
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
