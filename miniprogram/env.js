@@ -19,5 +19,5 @@ module.exports = {
   APP_VERSION: '1.0.0',
 
   /** 应用名称 */
-  APP_NAME: '课时管理'
+  APP_NAME: '智慧课时管理'
 }
