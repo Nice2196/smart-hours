@@ -2,8 +2,12 @@
  * initDB - 数据库初始化云函数
  *
  * 职责：
- *   1. 创建所有业务集合（首次写入时自动创建）
+ *   1. 使用 db.createCollection() API 显式创建所有业务集合
  *   2. 输出索引创建指引（需在云开发控制台手动创建）
+ *
+ * ⚠️ 注意：
+ *   - 新版微信云开发不再支持 "首次 add() 时自动建集合"，必须显式创建
+ *   - createCollection() 是官方 API，适用于基础版及以上环境
  *
  * ⚠️ 使用说明：
  *   1. 在微信开发者工具的云开发控制台 → 云函数 → initDB → 云端测试
@@ -80,8 +84,9 @@ const INDEX_GUIDE = [
 /**
  * 云函数入口
  *
- * 为每个集合写入一条初始化文档，触发集合自动创建。
- * 初始化文档随后会被删除，只保留集合结构。
+ * 使用 db.createCollection() API 显式创建集合。
+ * 注意：新版微信云开发不再支持 "首次 add() 自动建集合" 的行为，
+ * 必须先创建集合才能写入数据。
  */
 exports.main = async (event, context) => {
   const results = []
@@ -89,21 +94,8 @@ exports.main = async (event, context) => {
 
   for (const colDef of REQUIRED_COLLECTIONS) {
     try {
-      // 写入一条标记文档，触发集合自动创建
-      const addResult = await db.collection(colDef.name).add({
-        data: {
-          _type: '_init_marker',
-          _desc: `[initDB] ${colDef.desc} 集合初始化标记`,
-          createdAt: new Date()
-        }
-      })
-
-      // 立即删除标记文档（保持集合干净）
-      try {
-        await db.collection(colDef.name).doc(addResult._id).remove()
-      } catch (_) {
-        // 删除失败不影响结果
-      }
+      // 使用官方 createCollection API 创建集合
+      await db.createCollection(colDef.name)
 
       results.push({
         collection: colDef.name,
@@ -114,11 +106,17 @@ exports.main = async (event, context) => {
 
       console.log(`[initDB] ✅ ${colDef.name} - ${colDef.desc}`)
     } catch (err) {
-      // 集合可能已存在（重复执行时）
-      const alreadyExists = err.errCode === -1 || (err.message && (
-        err.message.includes('already exist') ||
-        err.message.includes('ResourceConflict')
-      ))
+      // 判断是否因为集合已存在而失败
+      const alreadyExists =
+        err.errCode === -1 ||
+        err.errCode === -502001 ||
+        (err.message && (
+          err.message.includes('already exist') ||
+          err.message.includes('ResourceConflict') ||
+          err.message.includes('CollectionAlreadyExists') ||
+          err.message.includes('already exists')
+        )) ||
+        (err.errMsg && err.errMsg.includes('already exist'))
 
       results.push({
         collection: colDef.name,
@@ -126,13 +124,13 @@ exports.main = async (event, context) => {
         status: alreadyExists ? 'already_exists' : 'error',
         message: alreadyExists
           ? `集合已存在: ${colDef.desc}`
-          : `创建失败: ${err.message}`
+          : `创建失败: ${err.message || err.errMsg || JSON.stringify(err)}`
       })
 
       if (alreadyExists) {
         console.log(`[initDB] ⏭ ${colDef.name} 已存在，跳过`)
       } else {
-        console.error(`[initDB] ❌ ${colDef.name} 失败:`, err.message)
+        console.error(`[initDB] ❌ ${colDef.name} 失败:`, err.message || err.errMsg || JSON.stringify(err))
       }
     }
   }
