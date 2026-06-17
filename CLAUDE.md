@@ -74,31 +74,45 @@
 - 测试失败时会阻断提交，告知失败原因
 - Commit 类型自动推断（修改文件类型 + diff 关键词）
 
-### 子Agent 调用规范
+### 子Agent 调用规范（含模型路由）
 
-当使用 Workflow 编排多个子Agent时，每个阶段使用对应 Skill：
+⚠️ **关键规则**：每个子 Agent 必须通过 `model` 参数显式指定目标模型。不指定则继承主会话模型。
+
+#### 模型别名 → 实际提供商映射
+
+| Agent `model` 参数 | 实际模型名 | 代理路由 | API 提供商 |
+|-------------------|-----------|---------|-----------|
+| `"sonnet"` (默认) | `deepseek-v4-pro` | `deepseek-*` → DeepSeek | `api.deepseek.com/anthropic` |
+| `"haiku"` | `mimo-v2.5-pro` | `mimo-*` → MiMo | `api.xiaomimimo.com/anthropic` |
+
+> 验证方式：`grep -E '\[(deepseek|mimo)\]' proxy.log` 查看代理实际路由记录。
+
+#### 本项目 8 阶段调用规范
 
 ```
-Phase 1: agent("PRD→技术SPEC", { skill: "prd-to-spec" })
-Phase 2: agent("DB Schema设计", { skill: "database-schema-designer" })
-         + agent("架构设计", { skill: "improve-codebase-architecture" })
-Phase 3: agent("模块实现", { skill: "backend-development" })
-Phase 4: parallel(/code-review, /security-review, /simplify)
-Phase 5: agent("pytest测试", { skill: "python-testing" })
-Phase 6: agent("GitFlow分支", { skill: "git-flow-branch-creator" })
-         → agent("规范提交", { skill: "conventional-commit" })
-         → agent("生成CHANGELOG", { skill: "changelog-generator" })
+Phase 1 (MiMo):  agent("PRD→技术SPEC",  { model: "haiku", skill: "prd-to-spec" })
+Phase 2 (DeepSeek): agent("DB Schema设计", { model: "sonnet", skill: "database-schema-designer" })
+                 + agent("架构设计",     { model: "sonnet", skill: "improve-codebase-architecture" })
+Phase 3 (DeepSeek): agent("云函数实现",   { model: "sonnet", skill: "backend-development" })
+Phase 4 (DeepSeek): agent("更多云函数",   { model: "sonnet", skill: "backend-development" })
+Phase 5 (MiMo):  agent("前端UI实现",   { model: "haiku" })
+Phase 6 (DeepSeek): parallel(/code-review, /security-review, /simplify)
+                 → 主会话直接执行（DeepSeek）
+Phase 7 (MiMo):  agent("测试计划",     { model: "haiku" })
+Phase 8 (MiMo):  agent("部署文档+CHANGELOG", { model: "haiku" })
 ```
 
-#### ⚠️ Phase 6 后必须立即提交（防漏）
+> **为什么**：代理按模型名前缀路由。不加 `model: "haiku"` 时子 Agent 继承主会话模型 `deepseek-v4-pro`，MiMo 阶段会被错误路由到 DeepSeek。
 
-Phase 6 Workflow 只**产出** commit message/CHANGELOG 文本，不执行 git 操作。Workflow 完成后，主会话**必须立即**执行：
+#### ⚠️ 每阶段完成后必须立即提交（防漏）
+
+每个 Phase 完成后，主会话**必须立即**执行：
 
 ```bash
-git add -A && git commit -m "<Phase6产出的message>" && git push origin <branch>
+git add -A && git commit -m "<phase产出>" && git push origin <branch>
 ```
 
-> **为什么**：Stop Hook (`auto-savepoint.py`) 在会话结束时才触发 git commit/push，但会话可能很长，中间如果出问题代码就丢了。Stop Hook 是**兜底**，Phase 6 后的主动提交是**主路径**。
+> **为什么**：Stop Hook (`auto-savepoint.py`) 在会话结束时才触发，但会话可能很长。Stop Hook 是**兜底**，每阶段主动提交是**主路径**。
 
 ### Skills 来源与质量
 
@@ -123,14 +137,28 @@ git add -A && git commit -m "<Phase6产出的message>" && git push origin <branc
 
 ### 流水线各阶段模型分配
 
-| 阶段 | 复杂度 | 使用模型 | 技能 |
-|------|--------|---------|------|
-| 1. 产品设计 | 🟡 中/低 | **mimo-v2.5-pro** | `prd-to-spec`, `documentation-writer` |
-| 2. 架构设计 | 🔴 高 | **deepseek-v4-pro** | `database-schema-designer`, `improve-codebase-architecture` |
-| 3. 编码开发 | 🔴 高 | **deepseek-v4-pro** | `backend-development`, `python-code-quality` |
-| 4. 代码Review | 🔴 高 | **deepseek-v4-pro** | `/code-review`, `/security-review`, `/simplify` |
-| 5. 测试 | 🟡 中/低 | **mimo-v2.5-pro** | `python-testing`, `/verify` |
-| 6. 发布上线 | 🟡 中/低 | **mimo-v2.5-pro** | `git-flow-branch-creator`, `conventional-commit` |
+**本项目 8 阶段**（微信小程序 + 云开发）：
+
+| 阶段 | 复杂度 | Agent model | 实际 API | 说明 |
+|------|--------|------------|---------|------|
+| 1. 产品设计 | 🟡 中/低 | **`"haiku"`** | `mimo-v2.5-pro` | PRD→技术规格 |
+| 2. 方案规划 | 🔴 高 | **`"sonnet"`** | `deepseek-v4-pro` | Skills选型+架构方案 |
+| 3. 架构+DB | 🔴 高 | **`"sonnet"`** | `deepseek-v4-pro` | DB Schema + 云函数架构 |
+| 4. 核心编码 | 🔴 高 | **`"sonnet"`** | `deepseek-v4-pro` | 云函数 + 公共模块 |
+| 5. 前端UI | 🟡 中/低 | **`"haiku"`** | `mimo-v2.5-pro` | WXML/WXSS/JS 页面+组件 |
+| 6. Code Review | 🔴 高 | **主会话** | `deepseek-v4-pro` | 全量审查+安全审查+修复 |
+| 7. 测试 | 🟡 中/低 | **`"haiku"`** | `mimo-v2.5-pro` | 测试计划+验证用例 |
+| 8. 发布上线 | 🟡 中/低 | **`"haiku"`** | `mimo-v2.5-pro` | 部署文档+手册+CHANGELOG |
+
+**Agent 调用时务必带 `model` 参数**，否则代理默认路由到 DeepSeek。
+
+#### 历史模型使用审计
+
+> 通过 proxy.log 验证 (`grep -E '\[(deepseek|mimo)\]' proxy.log`)：
+> - DeepSeek: 678 次，MiMo: 121 次
+> - Phase 1/5 的部分 MiMo 请求可确认（log 行号 75615-83338 区间）
+> - Phase 7/8 已确认使用 MiMo（log 行号 110000+ 区间，显式 `model: "haiku"`）
+> - **结论**: Phase 1/5 部分未指定 `model` 的子 Agent 实际走了 DeepSeek（本应 MiMo）
 
 ### 视觉/多模态处理
 
