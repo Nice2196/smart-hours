@@ -183,6 +183,25 @@ agent("PRD→技术SPEC", { skill: "prd-to-spec", model: "mimo-v2.5-pro" })
 
 `/fast` 使用 Haiku 模型层，已配置为 `mimo-v2.5-pro`。适合快速、低成本的简单任务。
 
+### 百万上下文支持（[1M] 标识）
+
+Claude Code 使用 `[1M]` 后缀标识百万上下文模型。代理层自动处理转换：
+
+| 配置的模型名 | 转发给 API 的模型名 | 上下文窗口 |
+|-------------|-------------------|-----------|
+| `mimo-v2.5-pro[1M]` | `mimo-v2.5-pro` | 1M tokens |
+| `deepseek-v4-pro[1M]` | `deepseek-v4-pro` | 1M tokens |
+
+**工作原理**：
+1. `settings.json` 中配置带 `[1M]` 后缀的模型名
+2. 代理的 `/v1/models` 端点返回支持的模型列表（含 `[1M]` 变体）
+3. 代理的 `clean_model_name()` 函数在转发请求时自动去掉 `[1M]` 后缀
+4. MiMo/DeepSeek API 收到的是干净的模型名
+
+**支持的百万上下文模型**：
+- `mimo-v2.5-pro[1M]` — MiMo V2.5 Pro，100万 token 上下文
+- `deepseek-v4-pro[1M]` — DeepSeek V4 Pro，100万 token 上下文
+
 ### 添加新提供商
 
 在 `proxy.py` 的 `PROVIDERS` 列表中添加一项即可，支持任意 Anthropic 兼容 API：
