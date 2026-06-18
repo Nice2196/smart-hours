@@ -173,6 +173,31 @@
   margin-top: 4rpx;
 }
 
+.lesson-arrow {
+  font-size: 32rpx;
+  color: var(--color-text-secondary);
+  margin-left: var(--spacing-sm);
+}
+
+.lesson-action {
+  margin-left: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.btn-deduct-small {
+  font-size: var(--font-size-xs);
+  padding: 8rpx 24rpx;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  border: none;
+  line-height: 1.5;
+}
+
+.btn-deduct-small:active {
+  opacity: 0.8;
+}
+
 .empty-lesson {
   text-align: center;
   padding: var(--spacing-xl);

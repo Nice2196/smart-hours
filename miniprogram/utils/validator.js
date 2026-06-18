@@ -75,10 +75,17 @@ function validateCourseForm(formData) {
 function validateScheduleForm(formData) {
   const errors = []
 
-  if (formData.dayOfWeek === undefined || formData.dayOfWeek === '') {
+  // 支持多选星期 (selectedDays 数组) 或单选 (dayOfWeek)
+  const days = formData.selectedDays || (formData.dayOfWeek !== undefined ? [formData.dayOfWeek] : [])
+  if (days.length === 0) {
     errors.push({ field: 'dayOfWeek', message: '请选择上课星期' })
-  } else if (Number(formData.dayOfWeek) < 0 || Number(formData.dayOfWeek) > 6) {
-    errors.push({ field: 'dayOfWeek', message: '无效的星期值' })
+  } else {
+    for (const d of days) {
+      if (Number(d) < 0 || Number(d) > 6) {
+        errors.push({ field: 'dayOfWeek', message: '无效的星期值' })
+        break
+      }
+    }
   }
 
   if (!formData.time) {

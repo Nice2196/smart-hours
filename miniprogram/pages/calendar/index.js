@@ -127,8 +127,22 @@ Page({
    */
   onLessonTap(e) {
     const { courseId } = e.currentTarget.dataset
-    wx.navigateTo({
-      url: `/pages/course/detail?id=${courseId}`
-    })
+    if (courseId) {
+      wx.navigateTo({
+        url: `/pages/course/detail?id=${courseId}`
+      })
+    }
+  },
+
+  /**
+   * 快速消课 → 从日历弹窗直接进入消课页
+   */
+  onQuickDeduct(e) {
+    const { courseId, date } = e.currentTarget.dataset
+    if (courseId) {
+      wx.navigateTo({
+        url: `/pages/lesson/add?courseId=${courseId}&date=${date || ''}`
+      })
+    }
   }
 })

@@ -202,20 +202,20 @@
     <view class="form-card">
       <view class="card-title">新增排课</view>
 
-      <!-- 星期 -->
+      <!-- 星期（多选） -->
       <view class="form-group">
-        <view class="form-label">上课星期</view>
-        <picker
-          range="{{weekdayOptions}}"
-          range-key="label"
-          value="{{weekdayIndex}}"
-          bindchange="onDayOfWeekChange"
-        >
-          <view class="form-picker">
-            {{weekdayOptions[weekdayIndex].label}}
-            <text class="picker-arrow">›</text>
+        <view class="form-label">上课星期（可多选）</view>
+        <view class="weekday-checkbox-group">
+          <view
+            class="weekday-checkbox {{scheduleForm.selectedDays.indexOf(item.value) > -1 ? 'checked' : ''}}"
+            wx:for="{{weekdayOptions}}"
+            wx:key="value"
+            data-day="{{item.value}}"
+            bindtap="onDayOfWeekToggle"
+          >
+            <text>{{item.label}}</text>
           </view>
-        </picker>
+        </view>
       </view>
 
       <!-- 时间 -->

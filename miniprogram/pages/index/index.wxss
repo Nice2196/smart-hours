@@ -76,6 +76,33 @@
   line-height: 1.4;
 }
 
+/* ==================== 状态筛选 Tab ==================== */
+.filter-tabs {
+  display: flex;
+  flex-direction: row;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-card);
+  border-bottom: 1rpx solid var(--color-border);
+  white-space: nowrap;
+}
+
+.filter-tab {
+  flex-shrink: 0;
+  padding: 10rpx 28rpx;
+  margin-right: 12rpx;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border-radius: 40rpx;
+  transition: all 0.2s;
+}
+
+.filter-tab.active {
+  color: #fff;
+  background: var(--color-primary);
+  font-weight: 500;
+}
+
 /* ==================== 课程列表 ==================== */
 .course-list {
   padding-bottom: var(--spacing-sm);

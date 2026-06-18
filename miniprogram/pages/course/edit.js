@@ -51,14 +51,12 @@ Page({
 
     /* ===== 排课表单 ===== */
     scheduleForm: {
-      dayOfWeek: 1,
+      selectedDays: [1],
       time: '17:00',
       effectiveFrom: ''
     },
     /** 星期选项 */
     weekdayOptions: WEEKDAY_LABELS.map((label, i) => ({ value: i, label })),
-    /** 星期选择索引 */
-    weekdayIndex: 1,
 
     /** 已有排课列表 */
     schedules: [],
@@ -232,22 +230,35 @@ Page({
 
   /* ===== 排课表单处理 ===== */
 
-  onDayOfWeekChange(e) {
-    const idx = parseInt(e.detail.value, 10)
-    this.setData({
-      weekdayIndex: idx,
-      'scheduleForm.dayOfWeek': idx
-    })
+  onDayOfWeekToggle(e) {
+    const day = e.currentTarget.dataset.day
+    const selectedDays = [...this.data.scheduleForm.selectedDays]
+    const idx = selectedDays.indexOf(day)
+    if (idx > -1) {
+      // 至少保留一个选中
+      if (selectedDays.length > 1) {
+        selectedDays.splice(idx, 1)
+      }
+    } else {
+      selectedDays.push(day)
+    }
+    selectedDays.sort((a, b) => a - b)
+    this.setData({ 'scheduleForm.selectedDays': selectedDays })
   },
 
   onTimeInput(e) { this.setData({ 'scheduleForm.time': e.detail.value }) },
   onEffectiveFromChange(e) { this.setData({ 'scheduleForm.effectiveFrom': e.detail.value }) },
 
   /**
-   * 添加/更新排课
+   * 添加排课（支持多选星期，每个选中的星期创建一条排课）
    */
   async onAddSchedule() {
-    const { scheduleForm, courseId, weekdayIndex } = this.data
+    const { scheduleForm, courseId } = this.data
+
+    if (!scheduleForm.selectedDays || scheduleForm.selectedDays.length === 0) {
+      wx.showToast({ title: '请至少选择一个上课星期', icon: 'none' })
+      return
+    }
 
     const validation = validateScheduleForm(scheduleForm)
     if (!validation.valid) {
@@ -258,27 +269,47 @@ Page({
     this.setData({ submitting: true })
 
     try {
-      await callCloud('schedule-manager', {
-        action: 'create',
-        data: {
-          courseId,
-          dayOfWeek: scheduleForm.dayOfWeek,
-          time: scheduleForm.time,
-          effectiveFrom: scheduleForm.effectiveFrom || undefined
-        }
-      })
+      let successCount = 0
+      let failCount = 0
 
-      wx.showToast({ title: '排课已添加', icon: 'success' })
+      // 为每个选中的星期创建一条排课
+      for (const dayOfWeek of scheduleForm.selectedDays) {
+        try {
+          await callCloud('schedule-manager', {
+            action: 'create',
+            data: {
+              courseId,
+              dayOfWeek: dayOfWeek,
+              time: scheduleForm.time,
+              effectiveFrom: scheduleForm.effectiveFrom || undefined
+            }
+          })
+          successCount++
+        } catch (err) {
+          failCount++
+          // 重复排课不视为致命错误，继续创建其他星期
+          if (err.message && err.message.includes('请勿重复添加')) {
+            console.warn('[edit] 跳过重复排课: 星期', dayOfWeek)
+          } else {
+            throw err
+          }
+        }
+      }
+
+      const msg = successCount > 0
+        ? `成功添加 ${successCount} 条排课` + (failCount > 0 ? `，${failCount} 条已存在` : '')
+        : `${failCount} 条排课均已存在`
+      wx.showToast({ title: msg, icon: 'success' })
+
       // 重新加载数据
       this.loadCourseData()
       // 重置排课表单
       this.setData({
         scheduleForm: {
-          dayOfWeek: 1,
+          selectedDays: [1],
           time: '17:00',
           effectiveFrom: ''
-        },
-        weekdayIndex: 1
+        }
       })
     } catch (err) {
       console.error('[edit] 添加排课失败:', err)

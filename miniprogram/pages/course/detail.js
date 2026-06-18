@@ -25,7 +25,7 @@ Page({
 
   onLoad(options) {
     const courseId = options.id
-    if (!courseId) {
+    if (!courseId || courseId === 'undefined' || courseId === 'null') {
       wx.showToast({ title: '缺少课程ID', icon: 'none' })
       wx.navigateBack()
       return
@@ -49,6 +49,11 @@ Page({
       })
 
       if (res.data) {
+        const course = res.data.course
+        // 预格式化日期字段（WXML 中无法直接调用 JS 方法）
+        course._startDate = this.formatDate(course.startDate)
+        course._expiryDate = this.formatDate(course.expiryDate)
+
         // 对排课预计算星期标签
         const schedules = (res.data.schedules || []).map(s => ({
           ...s,
@@ -56,8 +61,8 @@ Page({
         }))
 
         this.setData({
-          course: res.data.course,
-          courseStatusLabel: COURSE_STATUS_LABELS[res.data.course.status] || res.data.course.status,
+          course,
+          courseStatusLabel: COURSE_STATUS_LABELS[course.status] || course.status,
           schedules,
           loading: false
         })

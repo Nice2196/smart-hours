@@ -60,19 +60,26 @@
               <text class="lesson-name">{{item.courseName}}</text>
               <text class="lesson-time">{{item.time}} | {{item.deductionType === 'auto' ? '自动消课' : '手动消课'}} ({{item.deductionHours}}课时)</text>
             </view>
+            <view class="lesson-arrow">›</view>
           </view>
           <view
             class="lesson-item"
             wx:for="{{selectedLessons}}"
             wx:key="courseId"
             wx:if="{{!item.lessonRecordId}}"
-            data-course-id="{{item.courseId}}"
-            bindtap="onLessonTap"
           >
             <view class="lesson-status-dot {{item.status}}"></view>
             <view class="lesson-info">
               <text class="lesson-name">{{item.courseName}}</text>
               <text class="lesson-time">{{item.time}} | {{item.status === 'pending' ? '待上课' : '已错过'}}</text>
+            </view>
+            <view class="lesson-action" wx:if="{{item.status === 'pending'}}">
+              <button
+                class="btn-deduct-small"
+                data-course-id="{{item.courseId}}"
+                data-date="{{selectedDate}}"
+                catchtap="onQuickDeduct"
+              >消课</button>
             </view>
           </view>
         </block>

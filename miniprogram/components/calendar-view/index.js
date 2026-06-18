@@ -48,8 +48,11 @@ Component({
      * 构建 42 格月历矩阵
      */
     buildCells(year, month, days) {
-      const firstDayOfWeek = new Date(year, month - 1, 1).getDay()
-      const totalDays = new Date(year, month, 0).getDate()
+      // 使用北京时区计算月份第一天是星期几
+      const firstDayDate = new Date(Date.UTC(year, month - 1, 1))
+      const beijingFirstDay = new Date(firstDayDate.getTime() + 8 * 3600 * 1000)
+      const firstDayOfWeek = beijingFirstDay.getUTCDay()
+      const totalDays = new Date(Date.UTC(year, month, 0)).getUTCDate()
       const today = this.getTodayStr()
 
       // 构建日期索引
@@ -114,7 +117,9 @@ Component({
      */
     getTodayStr() {
       const now = new Date()
-      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+      // 使用北京时区获取今天的日期字符串
+      const beijing = new Date(now.getTime() + 8 * 3600 * 1000)
+      return `${beijing.getUTCFullYear()}-${String(beijing.getUTCMonth() + 1).padStart(2, '0')}-${String(beijing.getUTCDate()).padStart(2, '0')}`
     },
 
     /**

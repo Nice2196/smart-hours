@@ -27,7 +27,7 @@ Page({
 
   onLoad(options) {
     const courseId = options.courseId
-    if (!courseId) {
+    if (!courseId || courseId === 'undefined' || courseId === 'null') {
       wx.showToast({ title: '缺少课程ID', icon: 'none' })
       wx.navigateBack()
       return

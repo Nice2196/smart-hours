@@ -1,5 +1,5 @@
 <!-- 课程卡片组件 -->
-<view class="card" wx:if="{{course}}">
+<view class="card" wx:if="{{course}}" bindtap="onTap">
 
   <!-- 卡片头部 -->
   <view class="card-header">

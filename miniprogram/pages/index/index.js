@@ -17,8 +17,12 @@ const { COURSE_STATUS_LABELS } = require('../../utils/constants')
 
 Page({
   data: {
-    /** 课程列表 */
+    /** 课程列表（全量） */
     courses: [],
+    /** 筛选后的课程列表 */
+    filteredCourses: [],
+    /** 当前筛选项 */
+    activeFilter: '',
     /** 统计数据 */
     stats: {
       activeCourses: 0,
@@ -32,7 +36,7 @@ Page({
     /** 加载状态 */
     loading: true,
     /** 空状态 */
-    isEmpty: false
+    isEmpty: true
   },
 
   onLoad() {
@@ -84,6 +88,9 @@ Page({
         loading: false,
         isEmpty: courses.length === 0
       })
+
+      // 应用当前筛选
+      this.applyFilter()
     } catch (err) {
       this.setData({ loading: false })
       console.error('[index] 数据加载失败:', err)
@@ -100,22 +107,30 @@ Page({
   },
 
   /**
-   * 点击课程卡片 → 进入课程详情
+   * 切换状态筛选
    */
-  onCourseTap(e) {
-    const { courseId } = e.detail
-    wx.navigateTo({
-      url: `/pages/course/detail?id=${courseId}`
-    })
+  onFilterChange(e) {
+    const { filter } = e.currentTarget.dataset
+    this.setData({ activeFilter: filter })
+    this.applyFilter()
   },
 
   /**
-   * 快速手工消课
+   * 根据 activeFilter 筛选课程列表
    */
-  onQuickDeduct(e) {
-    const { courseId } = e.currentTarget.dataset
-    wx.navigateTo({
-      url: `/pages/lesson/add?courseId=${courseId}`
-    })
-  }
+  applyFilter() {
+    const { courses, activeFilter } = this.data
+    if (!activeFilter) {
+      this.setData({ filteredCourses: courses })
+    } else {
+      this.setData({
+        filteredCourses: courses.filter(c => c.status === activeFilter)
+      })
+    }
+  },
+
+  /**
+   * 注意：课程卡片的点击导航由 course-card 组件内部处理，
+   * 快速消课入口在课程详情页（pages/course/detail）中提供。
+   */
 })

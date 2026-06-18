@@ -41,13 +41,13 @@
         <text class="info-label">每次扣课时</text>
         <text class="info-value">{{course.deductionUnit || 1}} 课时</text>
       </view>
-      <view class="info-row" wx:if="{{course.startDate}}">
+      <view class="info-row" wx:if="{{course._startDate}}">
         <text class="info-label">开始日期</text>
-        <text class="info-value">{{course.startDate}}</text>
+        <text class="info-value">{{course._startDate}}</text>
       </view>
-      <view class="info-row" wx:if="{{course.expiryDate}}">
+      <view class="info-row" wx:if="{{course._expiryDate}}">
         <text class="info-label">过期日期</text>
-        <text class="info-value">{{course.expiryDate}}</text>
+        <text class="info-value">{{course._expiryDate}}</text>
       </view>
       <view class="info-row" wx:if="{{course.notes}}">
         <text class="info-label">备注</text>

@@ -49,22 +49,49 @@
 
   <!-- ==================== 课程列表 ==================== -->
   <block wx:if="{{!loading}}">
+
+    <!-- 状态筛选 Tab -->
+    <view class="filter-tabs" wx:if="{{!isEmpty}}">
+      <view
+        class="filter-tab {{activeFilter === '' ? 'active' : ''}}"
+        data-filter=""
+        bindtap="onFilterChange"
+      >全部</view>
+      <view
+        class="filter-tab {{activeFilter === 'active' ? 'active' : ''}}"
+        data-filter="active"
+        bindtap="onFilterChange"
+      >进行中</view>
+      <view
+        class="filter-tab {{activeFilter === 'paused' ? 'active' : ''}}"
+        data-filter="paused"
+        bindtap="onFilterChange"
+      >已暂停</view>
+      <view
+        class="filter-tab {{activeFilter === 'completed' ? 'active' : ''}}"
+        data-filter="completed"
+        bindtap="onFilterChange"
+      >已完成</view>
+      <view
+        class="filter-tab {{activeFilter === 'expired' ? 'active' : ''}}"
+        data-filter="expired"
+        bindtap="onFilterChange"
+      >已过期</view>
+    </view>
     <!-- 空状态 -->
     <empty-state
-      wx:if="{{isEmpty}}"
+      wx:if="{{filteredCourses.length === 0}}"
       icon="📚"
-      text="还没有课程记录"
-      subText="点击下方按钮添加第一门课程"
+      text="{{isEmpty ? '还没有课程记录' : '没有匹配的课程'}}"
+      subText="{{isEmpty ? '点击下方按钮添加第一门课程' : '尝试切换筛选条件'}}"
     />
 
     <!-- 课程卡片列表 -->
     <view class="course-list" wx:else>
       <course-card
-        wx:for="{{courses}}"
+        wx:for="{{filteredCourses}}"
         wx:key="_id"
         course="{{item}}"
-        bind:tap="onCourseTap"
-        bind:deduct="onQuickDeduct"
       />
     </view>
   </block>
