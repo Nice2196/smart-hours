@@ -204,3 +204,23 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
 }
+
+/* 弹窗底部操作栏 */
+.popup-footer {
+  padding: var(--spacing-md);
+  border-top: 1rpx solid var(--color-border);
+}
+
+.btn-add-lesson {
+  width: 100%;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-md);
+  padding: var(--spacing-sm) 0;
+  border: none;
+}
+
+.btn-add-lesson:active {
+  opacity: 0.8;
+}

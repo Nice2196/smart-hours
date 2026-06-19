@@ -87,6 +87,12 @@
           <text>当日无课程安排</text>
         </view>
       </view>
+      <!-- 弹窗底部操作栏 -->
+      <view class="popup-footer">
+        <button class="btn-add-lesson" bindtap="onManualAdd">
+          ✏️ 手动记录课时
+        </button>
+      </view>
     </view>
   </view>
 

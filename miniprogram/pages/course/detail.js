@@ -9,7 +9,7 @@
  */
 
 const { callCloud } = require('../../utils/auth')
-const { COURSE_STATUS_LABELS, WEEKDAY_LABELS } = require('../../utils/constants')
+const { COURSE_STATUS_LABELS, SUBJECT_LABELS, COURSE_TYPE_LABELS, WEEKDAY_LABELS } = require('../../utils/constants')
 
 Page({
   data: {
@@ -53,6 +53,9 @@ Page({
         // 预格式化日期字段（WXML 中无法直接调用 JS 方法）
         course._startDate = this.formatDate(course.startDate)
         course._expiryDate = this.formatDate(course.expiryDate)
+        // 翻译科目和类型标签
+        course._subjectLabel = SUBJECT_LABELS[course.subject] || course.subject || ''
+        course._courseTypeLabel = COURSE_TYPE_LABELS[course.courseType] || course.courseType || ''
 
         // 对排课预计算星期标签
         const schedules = (res.data.schedules || []).map(s => ({

@@ -144,5 +144,15 @@ Page({
         url: `/pages/lesson/add?courseId=${courseId}&date=${date || ''}`
       })
     }
+  },
+
+  /**
+   * 手动记录课时 → 跳转到消课页面
+   */
+  onManualAdd() {
+    const { selectedDate } = this.data
+    wx.navigateTo({
+      url: `/pages/lesson/add?date=${selectedDate}`
+    })
   }
 })

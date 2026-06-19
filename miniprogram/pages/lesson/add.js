@@ -35,8 +35,13 @@ Page({
 
   onLoad(options) {
     const courseId = options.courseId
+    const date = options.date
+
     if (courseId) {
       this.setData({ courseId })
+    }
+    if (date) {
+      this.setData({ lessonDate: date })
     }
     this.loadCourses()
   },

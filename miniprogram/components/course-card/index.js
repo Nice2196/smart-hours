@@ -8,7 +8,7 @@
  * @phase Phase 5
  */
 
-const { COURSE_STATUS_LABELS } = require('../../utils/constants')
+const { COURSE_STATUS_LABELS, SUBJECT_LABELS, COURSE_TYPE_LABELS } = require('../../utils/constants')
 
 Component({
   properties: {
@@ -26,14 +26,18 @@ Component({
           ? Math.round((course.consumedHours / course.totalHours) * 100)
           : 0
         const statusLabel = COURSE_STATUS_LABELS[course.status] || course.status
-        this.setData({ progressPercent, statusLabel })
+        const subjectLabel = SUBJECT_LABELS[course.subject] || course.subject || ''
+        const courseTypeLabel = COURSE_TYPE_LABELS[course.courseType] || course.courseType || ''
+        this.setData({ progressPercent, statusLabel, subjectLabel, courseTypeLabel })
       }
     }
   },
 
   data: {
     progressPercent: 0,
-    statusLabel: ''
+    statusLabel: '',
+    subjectLabel: '',
+    courseTypeLabel: ''
   },
 
   methods: {

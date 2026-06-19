@@ -23,11 +23,11 @@
     <view class="info-rows">
       <view class="info-row">
         <text class="info-label">科目</text>
-        <text class="info-value">{{course.subject}}</text>
+        <text class="info-value">{{course._subjectLabel}}</text>
       </view>
       <view class="info-row">
         <text class="info-label">类型</text>
-        <text class="info-value">{{course.courseType}}</text>
+        <text class="info-value">{{course._courseTypeLabel}}</text>
       </view>
       <view class="info-row">
         <text class="info-label">学生</text>
