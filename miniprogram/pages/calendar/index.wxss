@@ -179,6 +179,39 @@
   margin-left: var(--spacing-sm);
 }
 
+.lesson-btns {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.lesson-btn {
+  font-size: var(--font-size-xs);
+  padding: 6rpx 16rpx;
+  border-radius: var(--radius-sm);
+  margin-left: 8rpx;
+}
+
+.lesson-btn-edit {
+  color: var(--color-primary);
+  background: rgba(24, 144, 255, 0.1);
+}
+
+.lesson-btn-edit:active {
+  opacity: 0.7;
+}
+
+.lesson-btn-delete {
+  color: var(--color-expired);
+  background: rgba(255, 77, 79, 0.1);
+}
+
+.lesson-btn-delete:active {
+  opacity: 0.7;
+}
+
 .lesson-action {
   margin-left: var(--spacing-sm);
   flex-shrink: 0;

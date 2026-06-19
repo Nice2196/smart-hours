@@ -154,5 +154,49 @@ Page({
     wx.navigateTo({
       url: `/pages/lesson/add?date=${selectedDate}`
     })
+  },
+
+  /**
+   * 编辑手动消课记录 → 跳转到消课页面（编辑模式）
+   */
+  onEditLesson(e) {
+    const { recordId, courseId, hours, notes } = e.currentTarget.dataset
+    const { selectedDate } = this.data
+    wx.navigateTo({
+      url: `/pages/lesson/add?mode=edit&lessonRecordId=${recordId}&courseId=${courseId}&date=${selectedDate}&hours=${hours || ''}&notes=${encodeURIComponent(notes || '')}`
+    })
+  },
+
+  /**
+   * 删除手动消课记录
+   */
+  async onDeleteLesson(e) {
+    const { recordId } = e.currentTarget.dataset
+    if (!recordId) return
+
+    const confirmed = await new Promise(resolve => {
+      wx.showModal({
+        title: '确认删除',
+        content: '确定要删除这条消课记录吗？对应课时将退还。',
+        success: res => resolve(res.confirm)
+      })
+    })
+
+    if (!confirmed) return
+
+    try {
+      await callCloud('lesson-manager', {
+        action: 'cancel',
+        data: { lessonRecordId: recordId }
+      })
+      wx.showToast({ title: '已删除', icon: 'success' })
+      // 刷新日历数据
+      this.loadMonthData()
+      // 关闭弹窗
+      this.onCloseDetail()
+    } catch (err) {
+      console.error('[calendar] 删除消课记录失败:', err)
+      wx.showToast({ title: err.message || '删除失败', icon: 'none' })
+    }
   }
 })

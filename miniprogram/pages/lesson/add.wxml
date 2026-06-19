@@ -6,17 +6,22 @@
     <!-- 选择课程 -->
     <view class="form-group">
       <view class="form-label">选择课程</view>
-      <picker
-        range="{{courses}}"
-        range-key="name"
-        value="{{courseIndex}}"
-        bindchange="onCourseChange"
-      >
-        <view class="form-picker">
-          {{selectedCourse ? selectedCourse.name : '请选择课程'}}
-          <text class="picker-arrow">›</text>
-        </view>
-      </picker>
+      <block wx:if="{{mode !== 'edit'}}">
+        <picker
+          range="{{courses}}"
+          range-key="name"
+          value="{{courseIndex}}"
+          bindchange="onCourseChange"
+        >
+          <view class="form-picker">
+            {{selectedCourse ? selectedCourse.name : '请选择课程'}}
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+      </block>
+      <view class="form-picker form-picker-disabled" wx:else>
+        {{selectedCourse ? selectedCourse.name : '请选择课程'}}
+      </view>
     </view>
 
     <!-- 课程信息展示 -->
@@ -72,7 +77,7 @@
       disabled="{{!selectedCourse || submitting}}"
       loading="{{submitting}}"
     >
-      确认消课
+      {{submitText}}
     </button>
   </view>
 

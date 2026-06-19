@@ -66,6 +66,11 @@
   color: var(--color-text-secondary);
 }
 
+.form-picker-disabled {
+  color: var(--color-text-secondary);
+  background: var(--color-border);
+}
+
 /* 课程信息 */
 .course-info {
   background: var(--color-bg);

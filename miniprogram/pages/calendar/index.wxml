@@ -60,7 +60,23 @@
               <text class="lesson-name">{{item.courseName}}</text>
               <text class="lesson-time">{{item.time}} | {{item.deductionType === 'auto' ? '自动消课' : '手动消课'}} ({{item.deductionHours}}课时)</text>
             </view>
-            <view class="lesson-arrow">›</view>
+            <!-- 手动消课记录：编辑/删除按钮 -->
+            <view class="lesson-btns" wx:if="{{item.deductionType === 'manual'}}">
+              <text
+                class="lesson-btn lesson-btn-edit"
+                data-record-id="{{item.lessonRecordId}}"
+                data-course-id="{{item.courseId}}"
+                data-hours="{{item.deductionHours}}"
+                data-notes="{{item.notes}}"
+                catchtap="onEditLesson"
+              >编辑</text>
+              <text
+                class="lesson-btn lesson-btn-delete"
+                data-record-id="{{item.lessonRecordId}}"
+                catchtap="onDeleteLesson"
+              >删除</text>
+            </view>
+            <view class="lesson-arrow" wx:else>›</view>
           </view>
           <view
             class="lesson-item"
