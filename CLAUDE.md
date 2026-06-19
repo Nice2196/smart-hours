@@ -215,3 +215,42 @@ Claude Code 使用 `[1M]` 后缀标识百万上下文模型。代理层自动处
 - macOS Monterey 12.7.6 (Darwin 21.6.0)
 - MacBookAir7,2 (Intel x86_64)
 - 系统无法再升级（硬件限制）
+
+## 小程序自动发布流程
+
+### 阶段6发布上线 - 自动化脚本
+
+**脚本位置**: `scripts/auto-release.py`
+
+**功能**:
+1. 上传代码到微信后台（版本号自动递增）
+2. 生成预览二维码（`release/preview-qr.png`）
+3. 获取 access_token
+4. 生成体验版二维码（`release/experience-qr.png`，需先开通体验版）
+
+**使用方法**:
+```bash
+# 基本用法
+python3.11 scripts/auto-release.py
+
+# 带版本描述
+python3.11 scripts/auto-release.py "feat: 新功能描述"
+```
+
+**前提条件**:
+1. 微信开发者工具已启动并开启服务端口（60578）
+2. 已登录微信开发者工具
+
+**输出文件**:
+- `release/preview-qr.png` - 预览二维码
+- `release/experience-qr.png` - 体验版二维码
+- `.version` - 当前版本号记录
+
+**完整发布流程**:
+```
+阶段6发布上线
+  ├→ 执行 python3.11 scripts/auto-release.py "版本描述"
+  ├→ 扫描预览二维码验证功能
+  ├→ 确认无误后在微信公众平台提交审核
+  └→ 审核通过后发布上线
+```
