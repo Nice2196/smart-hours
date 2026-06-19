@@ -1,28 +1,22 @@
 #!/usr/bin/env python3.11
 """
-小程序自动发布脚本
+小程序自动发布脚本（使用 miniprogram-ci）
 功能：上传代码 → 设置体验版 → 获取预览码 → 获取体验码
 用法：python3.11 scripts/auto-release.py [版本描述]
 """
 
-import json
 import os
+import subprocess
 import sys
-import urllib.request
-import urllib.error
-import urllib.parse
 from datetime import datetime
 
 # ============================================================
 # 配置
 # ============================================================
 APPID = "wx73b9c9702f51e839"
-APPSECRET = "b4165d1d0d4b6a1d27bcf4bd1219a2dc"
 PROJECT_DIR = "/Volumes/macSdcard/AICoding/smart-hours"
-DEVTOOLS_PORT = 60578
+KEY_PATH = os.path.join(PROJECT_DIR, f"private.{APPID}.key")
 OUTPUT_DIR = os.path.join(PROJECT_DIR, "release")
-
-# 版本号文件
 VERSION_FILE = os.path.join(PROJECT_DIR, ".version")
 
 # ============================================================
@@ -34,36 +28,6 @@ def log(msg, level="INFO"):
     """打印日志"""
     timestamp = datetime.now().strftime("%H:%M:%S")
     print(f"[{timestamp}] [{level}] {msg}")
-
-
-def http_get(url, timeout=60):
-    """发送 GET 请求"""
-    try:
-        req = urllib.request.Request(url)
-        with urllib.request.urlopen(req, timeout=timeout) as response:
-            return response.read(), response.status
-    except urllib.error.HTTPError as e:
-        return e.read(), e.code
-    except Exception as e:
-        return str(e), 0
-
-
-def http_post(url, data=None, timeout=60):
-    """发送 POST 请求"""
-    try:
-        req = urllib.request.Request(url, data=data, method="POST")
-        req.add_header("Content-Type", "application/json")
-        with urllib.request.urlopen(req, timeout=timeout) as response:
-            return response.read(), response.status
-    except urllib.error.HTTPError as e:
-        return e.read(), e.code
-    except Exception as e:
-        return str(e), 0
-
-
-# ============================================================
-# 主要功能
-# ============================================================
 
 
 def get_version():
@@ -87,125 +51,176 @@ def get_version():
     return new_version
 
 
-def check_devtools():
-    """检查微信开发者工具是否运行"""
-    log("检查微信开发者工具...")
-    result, status = http_get(f"http://127.0.0.1:{DEVTOOLS_PORT}", timeout=5)
-    if status == 0:
-        log("微信开发者工具未运行或端口未开启", "ERROR")
+def check_prerequisites():
+    """检查前提条件"""
+    log("检查前提条件...")
+
+    # 检查密钥文件
+    if not os.path.exists(KEY_PATH):
+        log(f"密钥文件不存在: {KEY_PATH}", "ERROR")
+        log("请从微信公众平台下载代码上传密钥", "ERROR")
         return False
-    log("微信开发者工具已运行")
+    log("密钥文件存在")
+
+    # 检查 miniprogram-ci
+    try:
+        result = subprocess.run(
+            ["npx", "miniprogram-ci", "--version"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        log(f"miniprogram-ci 版本: {result.stdout.strip()}")
+    except Exception as e:
+        log(f"miniprogram-ci 未安装: {e}", "ERROR")
+        return False
+
     return True
 
 
 def upload_code(version, desc):
     """上传代码"""
     log(f"上传代码 (版本: {version})...")
-    # URL 编码参数
-    params = urllib.parse.urlencode(
-        {"project": PROJECT_DIR, "version": version, "desc": desc}
-    )
-    url = f"http://127.0.0.1:{DEVTOOLS_PORT}/v2/upload?{params}"
-    result, status = http_get(url, timeout=120)
 
-    if status == 200:
-        try:
-            data = json.loads(result)
-            if data.get("success"):
-                size = data.get("info", {}).get("size", {}).get("total", 0)
-                log(f"上传成功！包大小: {size / 1024:.2f} KB")
-                return True
-        except:
-            pass
+    cmd = [
+        "npx",
+        "miniprogram-ci",
+        "upload",
+        "--project",
+        PROJECT_DIR,
+        "--appid",
+        APPID,
+        "--private-key-path",
+        KEY_PATH,
+        "--version",
+        version,
+        "--desc",
+        desc,
+    ]
 
-    log(f"上传失败: {result}", "ERROR")
-    return False
-
-
-def get_preview_qr():
-    """获取预览二维码"""
-    log("生成预览二维码...")
-    params = urllib.parse.urlencode(
-        {"project": PROJECT_DIR, "format": "image", "qroutput": "terminal"}
-    )
-    url = f"http://127.0.0.1:{DEVTOOLS_PORT}/v2/preview?{params}"
-    result, status = http_get(url, timeout=60)
-
-    if status == 200:
-        # 检查是否是图片
-        if len(result) > 1000 and not result.startswith(b"{"):
-            output_path = os.path.join(OUTPUT_DIR, "preview-qr.png")
-            with open(output_path, "wb") as f:
-                f.write(result)
-            log(f"预览二维码已保存: {output_path}")
-            return True
-
-    log("预览二维码生成失败", "ERROR")
-    return False
-
-
-def get_access_token():
-    """获取 access_token"""
-    log("获取 access_token...")
-    url = f"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={APPID}&secret={APPSECRET}"
-    result, status = http_get(url, timeout=30)
-
-    if status == 200:
-        data = json.loads(result)
-        if "access_token" in data:
-            log(f"access_token 获取成功（有效期: {data.get('expires_in')}s）")
-            return data["access_token"]
-        else:
-            log(f"获取失败: {data}", "ERROR")
-    return None
-
-
-def get_experience_qr(access_token):
-    """获取体验版二维码"""
-    log("获取体验版二维码...")
-    url = f"https://api.weixin.qq.com/wxa/get_qrcode?access_token={access_token}"
-    result, status = http_get(url, timeout=30)
-
-    if status == 200:
-        # 检查是否是图片
-        if len(result) > 1000 and not result.startswith(b"{"):
-            output_path = os.path.join(OUTPUT_DIR, "experience-qr.png")
-            with open(output_path, "wb") as f:
-                f.write(result)
-            log(f"体验版二维码已保存: {output_path}")
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        if result.returncode == 0:
+            log("上传成功！")
+            # 提取包大小信息
+            for line in result.stdout.split("\n"):
+                if "size" in line.lower() or "包大小" in line:
+                    log(line.strip())
             return True
         else:
-            # 可能是错误响应
-            try:
-                data = json.loads(result)
-                log(f"获取失败: {data}", "ERROR")
-            except:
-                log(f"获取失败: {result}", "ERROR")
-    else:
-        log(f"请求失败: HTTP {status}", "ERROR")
-    return False
+            log(f"上传失败: {result.stderr}", "ERROR")
+            return False
+    except subprocess.TimeoutExpired:
+        log("上传超时", "ERROR")
+        return False
+    except Exception as e:
+        log(f"上传异常: {e}", "ERROR")
+        return False
 
 
-def set_experience_version(access_token):
+def set_experience_version(version):
     """设置体验版"""
     log("设置体验版...")
-    url = f"https://api.weixin.qq.com/wxa/set_experiencing_version?access_token={access_token}"
-    data = json.dumps({"action": "set"}).encode("utf-8")
-    result, status = http_post(url, data=data, timeout=30)
 
-    if status == 200:
-        try:
-            resp = json.loads(result)
-            if resp.get("errcode") == 0:
-                log("体验版设置成功！")
-                return True
-            else:
-                log(f"设置失败: {resp.get('errmsg', resp)}", "ERROR")
-        except:
-            log(f"设置失败: {result}", "ERROR")
-    else:
-        log(f"请求失败: HTTP {status}", "ERROR")
-    return False
+    cmd = [
+        "npx",
+        "miniprogram-ci",
+        "set-experience-version",
+        "--project",
+        PROJECT_DIR,
+        "--appid",
+        APPID,
+        "--private-key-path",
+        KEY_PATH,
+        "--version",
+        version,
+    ]
+
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        if result.returncode == 0:
+            log("体验版设置成功！")
+            return True
+        else:
+            log(f"设置失败: {result.stderr}", "ERROR")
+            return False
+    except Exception as e:
+        log(f"设置异常: {e}", "ERROR")
+        return False
+
+
+def get_experience_qr(version):
+    """获取体验版二维码"""
+    log("获取体验版二维码...")
+
+    cmd = [
+        "npx",
+        "miniprogram-ci",
+        "preview",
+        "--project",
+        PROJECT_DIR,
+        "--appid",
+        APPID,
+        "--private-key-path",
+        KEY_PATH,
+        "--version",
+        version,
+        "--desc",
+        "体验版",
+        "--qrcode-format",
+        "image",
+        "--qrcode-output",
+        os.path.join(OUTPUT_DIR, "experience-qr.png"),
+    ]
+
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        if result.returncode == 0:
+            log(f"体验版二维码已保存: {OUTPUT_DIR}/experience-qr.png")
+            return True
+        else:
+            log(f"获取失败: {result.stderr}", "ERROR")
+            return False
+    except Exception as e:
+        log(f"获取异常: {e}", "ERROR")
+        return False
+
+
+def get_preview_qr(version):
+    """获取预览二维码"""
+    log("生成预览二维码...")
+
+    cmd = [
+        "npx",
+        "miniprogram-ci",
+        "preview",
+        "--project",
+        PROJECT_DIR,
+        "--appid",
+        APPID,
+        "--private-key-path",
+        KEY_PATH,
+        "--version",
+        version,
+        "--desc",
+        "预览版",
+        "--qrcode-format",
+        "image",
+        "--qrcode-output",
+        os.path.join(OUTPUT_DIR, "preview-qr.png"),
+    ]
+
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        if result.returncode == 0:
+            log(f"预览二维码已保存: {OUTPUT_DIR}/preview-qr.png")
+            return True
+        else:
+            log(f"生成失败: {result.stderr}", "ERROR")
+            return False
+    except Exception as e:
+        log(f"生成异常: {e}", "ERROR")
+        return False
 
 
 # ============================================================
@@ -224,31 +239,27 @@ def main():
     version = get_version()
 
     print("=" * 50)
-    print("  小程序自动发布脚本")
+    print("  小程序自动发布脚本 (miniprogram-ci)")
     print("=" * 50)
     print(f"  APPID: {APPID}")
     print(f"  版本号: {version}")
     print(f"  描述: {desc}")
     print("=" * 50)
 
-    # Step 1: 检查微信开发者工具
-    if not check_devtools():
+    # Step 1: 检查前提条件
+    if not check_prerequisites():
         sys.exit(1)
 
     # Step 2: 上传代码
     if not upload_code(version, desc):
         sys.exit(1)
 
-    # Step 3: 获取预览二维码
-    get_preview_qr()
+    # Step 3: 设置体验版
+    set_experience_version(version)
 
-    # Step 4: 设置体验版并获取体验码
-    token = get_access_token()
-    if token:
-        # 先设置体验版
-        set_experience_version(token)
-        # 再获取体验版二维码
-        get_experience_qr(token)
+    # Step 4: 生成预览码和体验码
+    get_preview_qr(version)
+    get_experience_qr(version)
 
     # 完成
     print()
