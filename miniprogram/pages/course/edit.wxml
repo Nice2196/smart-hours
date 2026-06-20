@@ -221,12 +221,12 @@
       <!-- 时间 -->
       <view class="form-group">
         <view class="form-label">上课时间</view>
-        <input
-          class="form-input"
-          type="time"
-          value="{{scheduleForm.time}}"
-          bindinput="onTimeInput"
-        />
+        <picker mode="time" value="{{scheduleForm.time}}" bindchange="onTimeChange">
+          <view class="form-picker">
+            {{scheduleForm.time || '选择时间'}}
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
       </view>
 
       <!-- 生效日期（选填） -->

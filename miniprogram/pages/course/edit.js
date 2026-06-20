@@ -232,7 +232,7 @@ Page({
   /* ===== 排课表单处理 ===== */
 
   onDayOfWeekToggle(e) {
-    const day = e.currentTarget.dataset.day
+    const day = Number(e.currentTarget.dataset.day)
     const selectedDays = [...this.data.scheduleForm.selectedDays]
     const idx = selectedDays.indexOf(day)
     if (idx > -1) {
@@ -247,7 +247,7 @@ Page({
     this.setData({ 'scheduleForm.selectedDays': selectedDays })
   },
 
-  onTimeInput(e) { this.setData({ 'scheduleForm.time': e.detail.value }) },
+  onTimeChange(e) { this.setData({ 'scheduleForm.time': e.detail.value }) },
   onEffectiveFromChange(e) { this.setData({ 'scheduleForm.effectiveFrom': e.detail.value }) },
 
   /**
