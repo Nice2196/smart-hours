@@ -7,6 +7,43 @@
 
 ---
 
+## [1.0.12] - 2026-06-18
+
+### Fixed
+
+#### P0 — 核心功能修复（3 项）
+
+- **Bug 3** 修复 `calendarQuery` 云函数未交叉校验课程表，导致已删除课程仍出现在日历中
+- **Bug 7** 修复日历页面缺少 `onShow` 生命周期，切换月份后数据不刷新
+- **Bug 9** 修复统计图表 echarts 实例检测逻辑，使用 `Object.keys` 长度区分真实 echarts 与 placeholder，避免零参数 `init()` 调用崩溃
+
+#### P1 — UI/数据修复（7 项）
+
+- **Bug 1** 修复排课页面星期复选框预计算状态错误，导致初始勾选显示不正确
+- **Bug 4** 修复日历视图消课圆点不区分状态（已完成/待消课/已取消），同时修正消课类型标签显示
+- **Bug 5** 修复 `courseTypeLabel` 映射缺失，导致课程类型显示为 undefined
+- **Bug 6** 修复消课记录列表日期格式不统一，使用 `formatDate` 工具函数统一格式
+- **Bug 10** 修复审计日志 action/trigger 映射标签缺失，操作类型和触发方式显示为原始代码
+- **Bug 11** 替换已废弃的 `wx.getUserProfile` 接口，改用 `open-type="chooseAvatar"` 按钮 + `type="nickname"` 输入框获取用户头像和昵称
+- **Bug 12** 修复统计页面预警图标显示异常
+
+#### P2 — 样式修复（1 项）
+
+- **Bug 2** 修复 7 个 WXSS 文件中文字溢出问题，统一添加 `text-overflow: ellipsis` 和 `word-break: break-all`
+
+#### 其他
+
+- 移除 `lesson/list.js` 中重复的 `formatDate()` 方法（已通过 utils/date 导入）
+- 修复 `scripts/auto-release.py` 中 bare except 触发 ruff E722 警告
+
+### Changed
+
+- 统计图表组件 (`stats-chart`) echarts 检测改为基于 `Object.keys` 长度判断
+- 设置页面 (`settings`) 用户头像获取方式改为微信原生组件
+- `auto-release.py` bare except 改为 `except Exception`
+
+---
+
 ## [1.0.0] - 2026-06-16
 
 ### Added
