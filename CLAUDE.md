@@ -43,8 +43,9 @@
 | 2.架构 | `database-schema-designer` | `excalidraw-diagram-generator` `improve-codebase-architecture` `backend-development` | SPEC 完成后设计架构/DB |
 | 3.编码 | `backend-development` `python-code-quality` | `security-best-practices` | 架构确认后编码 |
 | 4.Review | `/code-review` | `/security-review` `/simplify` `refactor` | 编码完成后审查 |
-| 5.测试 | `python-testing` | `/verify` | Review 通过后写测试 |
-| 6.发布 | `git-flow-branch-creator` `conventional-commit` | `changelog-generator` `devops-engineer` `gh-fix-ci` | 测试通过后提交&部署 |
+| 5.前端UI | `frontend-design` | `excalidraw-diagram-generator` | 需要设计前端界面/组件时 |
+| 6.测试 | `python-testing` | `/verify` | Review 通过后写测试 |
+| 7.发布 | `git-flow-branch-creator` `conventional-commit` | `changelog-generator` `devops-engineer` `gh-fix-ci` | 测试通过后提交&部署 |
 
 ### 自动化 Hooks（已配置）
 
@@ -95,7 +96,8 @@ Phase 2 (DeepSeek): agent("DB Schema设计", { model: "sonnet", skill: "database
                  + agent("架构设计",     { model: "sonnet", skill: "improve-codebase-architecture" })
 Phase 3 (DeepSeek): agent("云函数实现",   { model: "sonnet", skill: "backend-development" })
 Phase 4 (DeepSeek): agent("更多云函数",   { model: "sonnet", skill: "backend-development" })
-Phase 5 (MiMo):  agent("前端UI实现",   { model: "haiku" })
+Phase 5 (MiMo):  agent("前端UI设计",   { model: "haiku", skill: "frontend-design" })
+                 + agent("前端UI实现",   { model: "haiku" })
 Phase 6 (DeepSeek): 主会话 /model sonnet 切换后执行 parallel(/code-review, /security-review, /simplify)
                  → 或用 agent("Review", { model: "sonnet" }) 子Agent 执行
 Phase 7 (MiMo):  agent("测试计划",     { model: "haiku" })
@@ -123,6 +125,7 @@ git add -A && git commit -m "<phase产出>" && git push origin <branch>
 | alirezarezvani/claude-skills | 18,145 | changelog-generator |
 | jeffallan/claude-skills | 9,913 | devops-engineer |
 | softaworks/agent-toolkit | 2,026 | database-schema-designer |
+| anthropics/claude-plugins-official | 官方 | frontend-design |
 
 ## 模型路由策略
 
@@ -146,7 +149,7 @@ git add -A && git commit -m "<phase产出>" && git push origin <branch>
 | 2. 方案规划 | 🔴 高 | **`"sonnet"`** | `deepseek-v4-pro` | Skills选型+架构方案 |
 | 3. 架构+DB | 🔴 高 | **`"sonnet"`** | `deepseek-v4-pro` | DB Schema + 云函数架构 |
 | 4. 核心编码 | 🔴 高 | **`"sonnet"`** | `deepseek-v4-pro` | 云函数 + 公共模块 |
-| 5. 前端UI | 🟡 中/低 | **`"haiku"`** | `mimo-v2.5-pro` | WXML/WXSS/JS 页面+组件 |
+| 5. 前端UI | 🟡 中/低 | **`"haiku"`** | `mimo-v2.5-pro` | frontend-design 设计 + WXML/WXSS/JS 实现 |
 | 6. Code Review | 🔴 高 | **`"sonnet"`** | `deepseek-v4-pro` | 用 `/model sonnet` 切换或用子Agent |
 | 7. 测试 | 🟡 中/低 | **`"haiku"`** | `mimo-v2.5-pro` | 测试计划+验证用例 |
 | 8. 发布上线 | 🟡 中/低 | **`"haiku"`** | `mimo-v2.5-pro` | 部署文档+手册+CHANGELOG |
