@@ -1,6 +1,3 @@
-@responsible MiMo-V2.5 Pro
-@phase Phase 8
-
 # 部署指南
 
 本文档指导你将 **智慧课时管理（SmartHours）** 微信小程序部署上线。
@@ -13,206 +10,190 @@
 |------|------|
 | 微信开发者工具 | 最新稳定版，已登录并关联小程序 AppID |
 | 小程序 AppID | 已注册并通过主体认证的小程序账号 |
-| Node.js | >= 16.x（云函数本地调试用） |
+| Node.js | >= 16.x（miniprogram-ci 依赖） |
 | 云开发环境 | 已在微信开发者工具中开通云开发，获取环境 ID |
+| 代码上传密钥 | 从微信公众平台下载，放在项目根目录 |
 
 ---
 
-## 2. 项目结构概览
+## 2. 一键发布流程（推荐）
 
-```
-project-root/
-├── cloudfunctions/              # 云函数目录
-│   ├── initDB/                  # 数据库初始化（创建集合+索引）
-│   ├── courseManager/           # 课程增删改查
-│   ├── scheduleManager/         # 排课管理
-│   ├── lessonManager/           # 手动消课
-│   ├── autoDeduct/              # 自动消课（定时触发，幂等）
-│   ├── statsQuery/              # 统计查询
-│   ├── calendarQuery/           # 日历视图查询
-│   └── auditQuery/              # 操作日志查询
-├── miniprogram/                 # 小程序前端
-│   ├── pages/                   # 9 个页面
-│   ├── components/              # 5 个公共组件
-│   ├── utils/
-│   │   └── env.js               # 环境 ID 配置
-│   └── app.js / app.json / app.wxss
-└── docs/                        # 文档
+### 2.1 自动发布脚本
+
+```bash
+python3.11 scripts/auto-release.py "版本描述"
 ```
 
-**公共模块（云函数共享）：**
+**脚本自动完成以下步骤：**
 
-| 模块 | 职责 |
-|------|------|
-| `db` | 数据库连接与通用操作封装 |
-| `auth` | 用户身份校验 |
-| `idempotency` | 幂等性控制（防重复扣课） |
-| `constants` | 全局常量定义 |
-| `logger` | 统一日志记录 |
+| 步骤 | 操作 | 产物 |
+|------|------|------|
+| 1 | 检查前提条件 | 密钥文件、miniprogram-ci |
+| 2 | 上传 8 个云函数 | 云函数部署到云端 |
+| 3 | 上传前端代码 | 版本号自动递增 |
+| 4 | 设置体验版 | 体验版可直接扫码访问 |
+| 5 | 生成预览二维码 | `release/preview-qr.png` |
+| 6 | 生成体验版二维码 | `release/experience-qr.png` |
+
+### 2.2 使用示例
+
+```bash
+# 基本用法
+python3.11 scripts/auto-release.py
+
+# 带版本描述
+python3.11 scripts/auto-release.py "feat(ui): 重新设计 UI 系统"
+
+# 修复 bug
+python3.11 scripts/auto-release.py "fix: 修复课时计算问题"
+```
+
+### 2.3 输出产物
+
+```
+release/
+├── preview-qr.png      # 预览码（有效期短，适合开发调试）
+└── experience-qr.png   # 体验码（有效期长，适合验收测试）
+```
+
+**扫码验收：**
+- 用微信扫描 `preview-qr.png` → 预览最新代码
+- 用微信扫描 `experience-qr.png` → 体验版（需先设置体验版）
 
 ---
 
-## 3. 云开发环境初始化
+## 3. 手动发布流程
 
-### 3.1 开通云开发
+如果自动脚本不可用，可按以下步骤手动操作。
 
-1. 打开微信开发者工具，进入项目
-2. 点击工具栏「云开发」按钮
-3. 首次使用会引导开通，选择合适的套餐（基础版即可满足需求）
-4. 记录云开发环境 ID（格式如 `cloud1-xxxxxxx`），后续配置需要
+### 3.1 上传云函数
 
-### 3.2 切换云开发环境
+**方式一：命令行（推荐）**
 
-在微信开发者工具中确认当前项目已关联到目标环境：
-- 顶部工具栏确认云环境 ID 正确
-- `project.config.json` 中 `cloudfunctionRoot` 指向 `cloudfunctions/`
+```bash
+# 上传单个云函数
+npx miniprogram-ci cloudfn \
+  --pp /Volumes/macSdcard/AICoding/smart-hours \
+  --appid wx73b9c9702f51e839 \
+  --pkp /Volumes/macSdcard/AICoding/smart-hours/private.wx73b9c9702f51e839.key \
+  --name course-manager
 
----
+# 批量上传所有云函数
+for func in init-db course-manager schedule-manager lesson-manager auto-deduct stats-query calendar-query audit-query; do
+  npx miniprogram-ci cloudfn \
+    --pp /Volumes/macSdcard/AICoding/smart-hours \
+    --appid wx73b9c9702f51e839 \
+    --pkp /Volumes/macSdcard/AICoding/smart-hours/private.wx73b9c9702f51e839.key \
+    --name "$func"
+done
+```
 
-## 4. 上传部署云函数
+**方式二：微信开发者工具**
 
-### 4.1 批量上传（推荐）
-
-在微信开发者工具中：
 1. 右键点击 `cloudfunctions` 目录
 2. 选择「上传并部署：云端安装依赖」
 3. 等待所有云函数上传完成
 
-### 4.2 逐个上传
+### 3.2 上传前端代码
 
-对每个云函数目录（如 `cloudfunctions/initDB`）：
-1. 右键点击云函数目录
-2. 选择「上传并部署：云端安装依赖」
-3. 等待上传成功提示
+```bash
+npx miniprogram-ci upload \
+  --pp /Volumes/macSdcard/AICoding/smart-hours \
+  --appid wx73b9c9702f51e839 \
+  --pkp /Volumes/macSdcard/AICoding/smart-hours/private.wx73b9c9702f51e839.key \
+  --uv 1.0.19 \
+  --ud "版本描述"
+```
 
-> **说明**：选择「云端安装依赖」会自动在云端执行 `npm install`，无需本地安装依赖。
+### 3.3 设置体验版
 
-### 4.3 验证部署
+```bash
+npx miniprogram-ci set-experience-version \
+  --pp /Volumes/macSdcard/AICoding/smart-hours \
+  --appid wx73b9c9702f51e839 \
+  --pkp /Volumes/macSdcard/AICoding/smart-hours/private.wx73b9c9702f51e839.key \
+  --uv 1.0.19
+```
 
-在云开发控制台 → 云函数列表中，确认以下 8 个云函数均已显示：
+### 3.4 生成预览码
 
-- [x] initDB
-- [x] courseManager
-- [x] scheduleManager
-- [x] lessonManager
-- [x] autoDeduct
-- [x] statsQuery
-- [x] calendarQuery
-- [x] auditQuery
+```bash
+npx miniprogram-ci preview \
+  --pp /Volumes/macSdcard/AICoding/smart-hours \
+  --appid wx73b9c9702f51e839 \
+  --pkp /Volumes/macSdcard/AICoding/smart-hours/private.wx73b9c9702f51e839.key \
+  --uv 1.0.19 \
+  --qrcode-format image \
+  --qrcode-output-dest release/preview-qr.png
+```
 
 ---
 
-## 5. 创建数据库集合和索引
+## 4. 云函数清单
 
-数据库初始化通过 `initDB` 云函数自动完成，无需手动创建。
+| 云函数 | 用途 | 定时触发 |
+|--------|------|---------|
+| `init-db` | 数据库初始化（创建集合+索引） | 否 |
+| `course-manager` | 课程增删改查 | 否 |
+| `schedule-manager` | 排课管理 | 否 |
+| `lesson-manager` | 手动消课 | 否 |
+| `auto-deduct` | 自动消课 | ✅ 每 30 分钟 |
+| `stats-query` | 统计查询 | 否 |
+| `calendar-query` | 日历视图查询 | 否 |
+| `audit-query` | 操作日志查询 | 否 |
 
-### 5.1 执行 initDB
+---
 
-1. 在云开发控制台 → 云函数列表 → 找到 `initDB`
+## 5. 数据库初始化
+
+首次使用需执行 `init-db` 云函数创建集合和索引。
+
+### 5.1 执行方式
+
+1. 在云开发控制台 → 云函数列表 → 找到 `init-db`
 2. 点击「云端测试」
 3. 不传参数，直接执行
-4. 返回结果中确认 5 个集合创建成功
+4. 返回结果中确认集合创建成功
 
-### 5.2 创建的集合清单
+### 5.2 创建的集合
 
 | 集合名 | 用途 | 主要索引 |
 |--------|------|---------|
-| `courses` | 课程信息 | `_id`, `createTime` |
-| `schedules` | 排课计划 | `_id`, `courseId`, `dayOfWeek` |
-| `lesson_records` | 消课记录 | `_id`, `courseId`, `date`, `deductType` |
-| `audit_logs` | 操作日志 | `_id`, `createTime`, `operation` |
-| `deduction_locks` | 消课锁（幂等） | `_id`, `courseId_date`（唯一索引） |
-
-### 5.3 验证
-
-在云开发控制台 → 数据库中，确认以上 5 个集合均已创建，且索引已建立。
+| `courses` | 课程信息 | `_openid+status`, `_openid+expiryDate` |
+| `schedules` | 排课计划 | `courseId+status`, `dayOfWeek+time+status` |
+| `lesson_records` | 消课记录 | `courseId+lessonDate`, `_openid+lessonDate` |
+| `audit_logs` | 操作日志 | `_openid+createdAt`, `_openid+courseId+createdAt` |
+| `deduction_locks` | 消课锁（幂等） | `lockKey` (UNIQUE), `expireAt` (TTL) |
 
 ---
 
-## 6. 配置定时触发器（autoDeduct）
+## 6. 定时触发器配置
 
-`autoDeduct` 云函数需要定时触发器，每 30 分钟自动执行一次消课检查。
+`auto-deduct` 需要定时触发器，每 30 分钟自动执行一次消课检查。
 
 ### 6.1 配置步骤
 
-1. 在云开发控制台 → 云函数列表 → 找到 `autoDeduct`
-2. 点击函数名进入详情
-3. 切换到「触发器」标签页
-4. 点击「创建触发器」
-5. 填写配置：
+1. 云开发控制台 → 云函数列表 → `auto-deduct`
+2. 点击函数名进入详情 → 「触发器」标签页
+3. 点击「创建触发器」
+4. 填写配置：
    - **触发方式**：定时触发
    - **Cron 表达式**：`0 */30 * * * * *`
-   - **含义**：每 30 分钟触发一次
-6. 保存
+5. 保存
 
-### 6.2 验证触发器
+### 6.2 验证
 
-创建完成后：
-1. 在触发器列表确认状态为「启用」
-2. 可点击「立即执行」手动触发一次测试
-3. 在云函数日志中查看执行结果
+- 确认触发器状态为「启用」
+- 可点击「立即执行」手动触发测试
+- 查看云函数日志确认执行结果
 
-> **重要**：`autoDeduct` 内置幂等控制（通过 `deduction_locks` 集合），同一课程同一天不会重复扣课，可安全多次触发。
+> **安全说明**：`auto-deduct` 内置幂等控制（通过 `deduction_locks` 集合），同一课程同一天不会重复扣课。
 
 ---
 
-## 7. 小程序端配置
+## 7. 提交审核与发布
 
-### 7.1 配置环境 ID
-
-编辑 `miniprogram/utils/env.js`，将云开发环境 ID 替换为你的实际环境 ID：
-
-```javascript
-const env = {
-  // 替换为你的真实环境 ID
-  CLOUD_ENV_ID: 'cloud1-xxxxxxx'
-}
-
-module.exports = env
-```
-
-### 7.2 检查 app.js 云环境初始化
-
-确认 `miniprogram/app.js` 中云环境初始化代码正确：
-
-```javascript
-App({
-  onLaunch() {
-    wx.cloud.init({
-      env: 'cloud1-xxxxxxx',  // 替换为你的环境 ID
-      traceUser: true
-    })
-  }
-})
-```
-
-### 7.3 域名配置
-
-小程序后台 → 开发管理 → 服务器域名，如需调用外部接口需添加白名单。本项目使用云开发，一般无需额外配置。
-
----
-
-## 8. 上传小程序代码
-
-### 8.1 本地预览
-
-1. 在微信开发者工具中点击「预览」
-2. 使用微信扫码在手机上预览
-3. 验证各功能是否正常：
-   - 创建课程
-   - 设置排课
-   - 手动消课
-   - 查看日历和统计
-   - 查看操作日志
-
-### 8.2 上传代码
-
-1. 确认所有功能验证通过
-2. 点击微信开发者工具右上角「上传」
-3. 填写版本号（如 `1.0.0`）和项目备注
-4. 点击确认上传
-
-### 8.3 提交审核
+### 7.1 提交审核
 
 1. 登录 [微信公众平台](https://mp.weixin.qq.com/)
 2. 进入「管理」→「版本管理」
@@ -221,7 +202,7 @@ App({
 5. 填写功能页面信息、类目信息
 6. 提交后等待微信审核（通常 1-3 个工作日）
 
-### 8.4 发布上线
+### 7.2 发布上线
 
 审核通过后：
 1. 在版本管理页面会显示「审核版本」
@@ -230,56 +211,35 @@ App({
 
 ---
 
-## 9. 常见问题排查
+## 8. 版本号管理
+
+版本号记录在以下位置（自动同步）：
+
+| 文件 | 字段 |
+|------|------|
+| `.version` | 纯文本版本号 |
+| `project.config.json` | `version` 字段 |
+| `miniprogram/app.js` | `globalData.version` 字段 |
+
+自动发布脚本会自动递增 patch 版本号（如 `1.0.18` → `1.0.19`）。
+
+---
+
+## 9. 常见问题
 
 ### Q1: 云函数调用报错「云函数不存在」
 
-**原因**：云函数未上传或环境 ID 不匹配。
+**解决**：确认云函数已上传，且 `env.js` 中的环境 ID 正确。
 
-**解决**：
-1. 确认云函数已上传（控制台可见）
-2. 确认 `env.js` 和 `app.js` 中的环境 ID 一致
-3. 确认微信开发者工具顶部选择的云环境正确
+### Q2: 自动发布脚本上传云函数失败
 
-### Q2: 数据库集合创建失败
+**解决**：检查网络连接，或手动逐个上传云函数。
 
-**原因**：云开发环境未正确初始化或权限不足。
+### Q3: 预览码/体验码过期
 
-**解决**：
-1. 确认云开发已开通且余额充足
-2. 重新执行 `initDB` 云函数
-3. 查看云函数日志定位具体错误
+**解决**：重新运行 `python3.11 scripts/auto-release.py` 生成新的二维码。
 
-### Q3: autoDeduct 定时触发未执行
-
-**原因**：触发器未创建或状态异常。
-
-**解决**：
-1. 检查触发器是否显示「启用」状态
-2. 确认 Cron 表达式为 `0 */30 * * * * *`
-3. 手动执行一次确认云函数本身无报错
-4. 查看云函数日志排查执行异常
-
-### Q4: 消课记录重复
-
-**原因**：正常情况下不会发生，`autoDeduct` 有幂等控制。
-
-**解决**：
-1. 检查 `deduction_locks` 集合中是否有多余记录
-2. 查看 `lesson_records` 中重复记录的 `deductType` 和时间戳
-3. 如确有异常，可通过 `audit_logs` 追溯操作记录
-
-### Q5: 前端页面白屏
-
-**原因**：云环境未初始化或网络异常。
-
-**解决**：
-1. 打开微信开发者工具 Console 查看报错
-2. 确认 `app.js` 中 `wx.cloud.init()` 在 `onLaunch` 中调用
-3. 检查手机网络连接
-4. 小程序基础库版本过低，升级到最新版
-
-### Q6: 小程序审核不通过
+### Q4: 小程序审核不通过
 
 **常见原因及对策**：
 
@@ -287,17 +247,16 @@ App({
 |------|------|
 | 类目选择不当 | 选择「教育 → 在线教育」或「工具 → 信息查询」 |
 | 功能页面不完整 | 确保每个 tab 页面都有实际内容 |
-| 诱导分享 | 移除任何强制分享逻辑 |
 | 隐私协议 | 在设置页添加隐私协议说明 |
 
 ---
 
-## 10. 上线后检查清单
+## 10. 上线检查清单
 
-- [ ] 云开发环境 ID 配置正确
+- [ ] 云开发环境 ID 配置正确（`env.js` + `app.js`）
 - [ ] 8 个云函数全部上传成功
 - [ ] 5 个数据库集合已创建且索引正确
-- [ ] autoDeduct 定时触发器已启用（每 30 分钟）
+- [ ] `auto-deduct` 定时触发器已启用（每 30 分钟）
 - [ ] 手机端预览功能正常
 - [ ] 小程序代码已上传并提交审核
 - [ ] 审核通过后已点击发布

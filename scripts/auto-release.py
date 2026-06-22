@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.11
 """
 小程序自动发布脚本（使用 miniprogram-ci）
-功能：上传代码 → 设置体验版 → 获取预览码 → 获取体验码
+功能：上传云函数 → 上传前端代码 → 设置体验版 → 获取预览码 → 获取体验码
 用法：python3.11 scripts/auto-release.py [版本描述]
 """
 
@@ -348,6 +348,73 @@ def get_experience_qr_by_api():
 
 
 # ============================================================
+# 云函数上传
+# ============================================================
+
+CLOUDFUNCTIONS_DIR = os.path.join(PROJECT_DIR, "cloudfunctions")
+
+# 需要上传的云函数列表（排除 common 目录）
+CLOUD_FUNCTIONS = [
+    "init-db",
+    "course-manager",
+    "schedule-manager",
+    "lesson-manager",
+    "auto-deduct",
+    "stats-query",
+    "calendar-query",
+    "audit-query",
+]
+
+
+def upload_cloud_functions():
+    """上传所有云函数"""
+    log("开始上传云函数...")
+
+    success_count = 0
+    fail_count = 0
+
+    for func_name in CLOUD_FUNCTIONS:
+        func_dir = os.path.join(CLOUDFUNCTIONS_DIR, func_name)
+        if not os.path.isdir(func_dir):
+            log(f"云函数目录不存在，跳过: {func_name}", "WARN")
+            fail_count += 1
+            continue
+
+        log(f"上传云函数: {func_name}...")
+        cmd = [
+            "npx",
+            "miniprogram-ci",
+            "cloudfn",
+            "--pp",
+            PROJECT_DIR,
+            "--appid",
+            APPID,
+            "--pkp",
+            KEY_PATH,
+            "--name",
+            func_name,
+        ]
+
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            if result.returncode == 0:
+                log(f"  ✓ {func_name} 上传成功")
+                success_count += 1
+            else:
+                log(f"  ✗ {func_name} 上传失败: {result.stderr}", "ERROR")
+                fail_count += 1
+        except subprocess.TimeoutExpired:
+            log(f"  ✗ {func_name} 上传超时", "ERROR")
+            fail_count += 1
+        except Exception as e:
+            log(f"  ✗ {func_name} 上传异常: {e}", "ERROR")
+            fail_count += 1
+
+    log(f"云函数上传完成: 成功 {success_count}, 失败 {fail_count}")
+    return fail_count == 0
+
+
+# ============================================================
 # 主流程
 # ============================================================
 
@@ -374,17 +441,20 @@ def main():
     if not check_prerequisites():
         sys.exit(1)
 
-    # Step 2: 上传代码
+    # Step 2: 上传云函数（有变更时才需要）
+    upload_cloud_functions()
+
+    # Step 3: 上传前端代码
     if not upload_code(version, desc):
         sys.exit(1)
 
-    # Step 3: 设置体验版
+    # Step 4: 设置体验版
     set_experience_version(version)
 
-    # Step 4: 生成预览码
+    # Step 5: 生成预览码
     get_preview_qr(version)
 
-    # Step 5: 通过 API 获取体验码
+    # Step 6: 通过 API 获取体验码
     get_experience_qr_by_api()
 
     # 完成

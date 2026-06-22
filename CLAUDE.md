@@ -225,11 +225,13 @@ Claude Code 使用 `[1M]` 后缀标识百万上下文模型。代理层自动处
 
 **脚本位置**: `scripts/auto-release.py`
 
-**功能**:
-1. 上传代码到微信后台（版本号自动递增）
-2. 生成预览二维码（`release/preview-qr.png`）
-3. 获取 access_token
-4. 生成体验版二维码（`release/experience-qr.png`，需先开通体验版）
+**功能（6 步自动完成）**:
+1. 检查前提条件（密钥文件、miniprogram-ci）
+2. 上传 8 个云函数到云端
+3. 上传前端代码到微信后台（版本号自动递增）
+4. 设置体验版
+5. 生成预览二维码（`release/preview-qr.png`）
+6. 生成体验版二维码（`release/experience-qr.png`）
 
 **使用方法**:
 ```bash
@@ -241,19 +243,38 @@ python3.11 scripts/auto-release.py "feat: 新功能描述"
 ```
 
 **前提条件**:
-1. 微信开发者工具已启动并开启服务端口（60578）
-2. 已登录微信开发者工具
+1. Node.js >= 16.x（miniprogram-ci 依赖）
+2. 代码上传密钥文件放在项目根目录（`private.{APPID}.key`）
+3. 云开发环境已开通
 
 **输出文件**:
-- `release/preview-qr.png` - 预览二维码
-- `release/experience-qr.png` - 体验版二维码
+- `release/preview-qr.png` - 预览二维码（有效期短，适合开发调试）
+- `release/experience-qr.png` - 体验版二维码（有效期长，适合验收）
 - `.version` - 当前版本号记录
+
+**云函数清单**（8 个）:
+- `init-db` - 数据库初始化
+- `course-manager` - 课程 CRUD
+- `schedule-manager` - 排课管理
+- `lesson-manager` - 手动消课
+- `auto-deduct` - 自动消课（定时触发，每 30 分钟）
+- `stats-query` - 统计查询
+- `calendar-query` - 日历查询
+- `audit-query` - 操作日志查询
 
 **完整发布流程**:
 ```
 阶段6发布上线
   ├→ 执行 python3.11 scripts/auto-release.py "版本描述"
+  │   ├→ 自动上传 8 个云函数
+  │   ├→ 自动上传前端代码
+  │   ├→ 自动设置体验版
+  │   └→ 自动生成预览码 + 体验码
   ├→ 扫描预览二维码验证功能
   ├→ 确认无误后在微信公众平台提交审核
   └→ 审核通过后发布上线
 ```
+
+**验收方式**:
+- 扫描 `release/preview-qr.png` → 预览最新代码
+- 扫描 `release/experience-qr.png` → 体验版（需先设置体验版）
