@@ -1,11 +1,13 @@
-<!-- 设置页 -->
+<!--
+  设置页
+  设计语言：「墨蓝 · 纸白」
+-->
 <view class="page-container">
 
   <!-- ==================== 用户信息 ==================== -->
-  <view class="card">
-    <view class="card-title">用户信息</view>
+  <view class="section-card">
+    <text class="section-label">用户信息</text>
 
-    <!-- 用户头像昵称（Bug 11 修复：chooseAvatar + type="nickname"） -->
     <view class="setting-item user-profile">
       <button
         class="avatar-btn"
@@ -19,12 +21,12 @@
           wx:if="{{avatarUrl}}"
         />
         <view class="user-avatar-placeholder" wx:else>
-          <text>👤</text>
+          <text class="avatar-icon">👤</text>
         </view>
       </button>
       <view class="si-left">
         <text class="si-label">{{nickname || '微信用户'}}</text>
-        <text class="si-value">点击头像更换，下方输入昵称</text>
+        <text class="si-hint">点击头像更换，下方输入昵称</text>
       </view>
     </view>
 
@@ -41,93 +43,109 @@
       />
     </view>
 
-    <!-- 用户标识（仅展示昵称，OpenID 折叠在复制按钮中） -->
     <view class="setting-item" bindtap="onCopyOpenid" wx:if="{{openid}}">
       <view class="si-left">
         <text class="si-label">用户ID</text>
-        <text class="si-value">{{nickname || openid}}</text>
+        <text class="si-hint">{{nickname || openid}}</text>
       </view>
-      <text class="si-action">复制ID</text>
+      <text class="si-action">复制</text>
     </view>
   </view>
 
   <!-- ==================== 系统设置 ==================== -->
-  <view class="card mt-md">
-    <view class="card-title">系统设置</view>
+  <view class="section-card">
+    <text class="section-label">系统设置</text>
 
-    <!-- 默认预警阈值 -->
     <view class="setting-item">
       <view class="si-left">
         <text class="si-label">低课时预警阈值</text>
-        <text class="si-value">剩余课时低于该值时提醒</text>
+        <text class="si-hint">剩余课时低于该值时提醒</text>
       </view>
-      <input
-        class="si-input"
-        type="number"
-        value="{{defaultLowHoursThreshold}}"
-        bindinput="onThresholdInput"
-      />
-      <text class="si-unit">课时</text>
+      <view class="si-input-group">
+        <input
+          class="si-input si-input-sm"
+          type="number"
+          value="{{defaultLowHoursThreshold}}"
+          bindinput="onThresholdInput"
+        />
+        <text class="si-unit">课时</text>
+      </view>
     </view>
 
-    <!-- 初始化数据库 -->
     <view class="setting-item" bindtap="onInitDB">
       <view class="si-left">
         <text class="si-label">初始化数据库索引</text>
-        <text class="si-value">首次使用需执行一次</text>
+        <text class="si-hint">首次使用需执行一次</text>
       </view>
       <text class="si-action">执行</text>
     </view>
 
-    <!-- 操作日志 -->
     <view class="setting-item" bindtap="onViewAuditLog">
       <view class="si-left">
         <text class="si-label">操作日志</text>
-        <text class="si-value">查看所有操作记录</text>
+        <text class="si-hint">查看所有操作记录</text>
       </view>
       <text class="si-arrow">›</text>
     </view>
   </view>
 
   <!-- ==================== 缓存管理 ==================== -->
-  <view class="card mt-md">
-    <view class="card-title">缓存管理</view>
+  <view class="section-card">
+    <text class="section-label">缓存管理</text>
     <view class="setting-item" bindtap="onClearCache">
       <view class="si-left">
         <text class="si-label">清除缓存</text>
-        <text class="si-value">清除本地存储数据</text>
+        <text class="si-hint">清除本地存储数据</text>
       </view>
       <text class="si-action">清除</text>
     </view>
   </view>
 
   <!-- ==================== 关于 ==================== -->
-  <view class="card mt-md">
-    <view class="card-title">关于</view>
-    <view class="about-item">
+  <view class="section-card">
+    <text class="section-label">关于</text>
+    <view class="about-row">
       <text class="about-label">版本</text>
       <text class="about-value">v{{version}}</text>
     </view>
-    <view class="about-item">
+    <view class="about-row">
       <text class="about-label">技术栈</text>
       <text class="about-value">微信原生 + 云开发</text>
     </view>
-    <view class="about-item">
+    <view class="about-row">
       <text class="about-label">数据库</text>
       <text class="about-value">云数据库（文档型）</text>
     </view>
   </view>
 
-  <!-- ==================== 说明 ==================== -->
-  <view class="card mt-md">
-    <view class="card-title">使用说明</view>
-    <view class="help-text">
-      <text>1. 首次使用请在「系统设置」中初始化数据库索引</text>
-      <text>2. 创建课程后，设置固定排课即可启用自动消课</text>
-      <text>3. 自动消课每小时检查一次，在日历页查看状态</text>
-      <text>4. 手动消课适合临时上课场景</text>
-      <text>5. 所有操作均有审计日志记录</text>
-      <text>6. 数据通过 OPENID 隔离，不同用户互不可见</text>
+  <!-- ==================== 使用说明 ==================== -->
+  <view class="section-card">
+    <text class="section-label">使用说明</text>
+    <view class="help-list">
+      <view class="help-item">
+        <text class="help-num">1</text>
+        <text class="help-text">首次使用请在「系统设置」中初始化数据库索引</text>
+      </view>
+      <view class="help-item">
+        <text class="help-num">2</text>
+        <text class="help-text">创建课程后，设置固定排课即可启用自动消课</text>
+      </view>
+      <view class="help-item">
+        <text class="help-num">3</text>
+        <text class="help-text">自动消课每小时检查一次，在日历页查看状态</text>
+      </view>
+      <view class="help-item">
+        <text class="help-num">4</text>
+        <text class="help-text">手动消课适合临时上课场景</text>
+      </view>
+      <view class="help-item">
+        <text class="help-num">5</text>
+        <text class="help-text">所有操作均有审计日志记录</text>
+      </view>
+      <view class="help-item">
+        <text class="help-num">6</text>
+        <text class="help-text">数据通过 OPENID 隔离，不同用户互不可见</text>
+      </view>
     </view>
   </view>
 

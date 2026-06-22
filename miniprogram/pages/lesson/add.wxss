@@ -1,6 +1,8 @@
 /**
  * 手动消课页样式
+ * 设计语言：「墨蓝 · 纸白」
  */
+
 .page-container {
   min-height: 100vh;
   background-color: var(--color-bg);
@@ -15,68 +17,88 @@
 }
 
 .form-group {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .form-label {
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
+  font-weight: 500;
   margin-bottom: var(--spacing-xs);
 }
 
 .form-input {
   width: 100%;
-  height: 80rpx;
-  padding: 0 var(--spacing-sm);
+  height: 88rpx;
+  padding: 0 var(--spacing-md);
   background: var(--color-bg);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  border: 1rpx solid var(--color-border);
+  border: 2rpx solid var(--color-border);
+  transition: border-color 0.2s var(--ease-out);
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-card);
 }
 
 .form-textarea {
   width: 100%;
-  min-height: 100rpx;
-  padding: var(--spacing-sm);
+  min-height: 120rpx;
+  padding: var(--spacing-md);
   background: var(--color-bg);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  border: 1rpx solid var(--color-border);
+  border: 2rpx solid var(--color-border);
+  transition: border-color 0.2s var(--ease-out);
+}
+
+.form-textarea:focus {
+  border-color: var(--color-primary);
+  background: var(--color-card);
 }
 
 .form-picker {
   width: 100%;
-  height: 80rpx;
-  padding: 0 var(--spacing-sm);
+  height: 88rpx;
+  padding: 0 var(--spacing-md);
   background: var(--color-bg);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  border: 1rpx solid var(--color-border);
+  border: 2rpx solid var(--color-border);
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  transition: border-color 0.2s var(--ease-out);
+}
+
+.form-picker:active {
+  border-color: var(--color-primary);
 }
 
 .picker-arrow {
   font-size: var(--font-size-xl);
-  color: var(--color-text-secondary);
+  color: var(--color-text-disabled);
 }
 
 .form-picker-disabled {
   color: var(--color-text-secondary);
   background: var(--color-border);
+  border-color: var(--color-border);
 }
 
 /* 课程信息 */
 .course-info {
-  background: var(--color-bg);
-  border-radius: var(--radius-sm);
+  background: var(--color-primary-light);
+  border-radius: var(--radius-md);
   padding: var(--spacing-sm) var(--spacing-md);
   margin-bottom: var(--spacing-md);
+  border-left: 4rpx solid var(--color-primary);
 }
 
 .ci-row {
@@ -96,42 +118,48 @@
   flex: 1;
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-weight: 500;
 }
 
 .ci-highlight {
   color: var(--color-primary);
-  font-weight: 600;
-  flex-shrink: 0;
+  font-weight: 700;
 }
 
 .btn {
   width: 100%;
-  height: 88rpx;
+  height: 96rpx;
   border-radius: var(--radius-md);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   margin-top: var(--spacing-lg);
+  letter-spacing: 0.04em;
+  transition: all 0.15s var(--ease-out);
+}
+
+.btn:active {
+  transform: scale(0.97);
 }
 
 .btn-primary {
   background: var(--color-primary);
-  color: #fff;
+  color: #FFFFFF;
+  box-shadow: 0 4rpx 14rpx rgba(79, 70, 229, 0.25);
 }
 
 .loading-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-2xl);
 }
 
 .loading-text {
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
   font-size: var(--font-size-sm);
 }

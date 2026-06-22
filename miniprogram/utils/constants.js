@@ -62,11 +62,11 @@ const ACTION_TYPE_LABELS = {
 /** 星期 */
 const WEEKDAY_LABELS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
 
-/** 日历状态颜色 */
+/** 日历状态颜色（墨蓝·纸白 设计系统） */
 const LESSON_COLORS = {
-  completed: '#52C41A',  // 绿色：已完成
-  pending: '#1890FF',    // 蓝色：待上课
-  expired: '#FF4D4F'     // 红色：已过期
+  completed: '#059669',  // 翠绿：已完成
+  pending: '#4F46E5',    // 靛蓝：待上课
+  expired: '#DC2626'     // 正红：已过期
 }
 
 /** 业务常量 */

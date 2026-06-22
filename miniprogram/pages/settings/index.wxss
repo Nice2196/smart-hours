@@ -1,30 +1,36 @@
 /**
  * 设置页样式
+ * 设计语言：「墨蓝 · 纸白」
  */
+
 .page-container {
   min-height: 100vh;
   background-color: var(--color-bg);
   padding: var(--spacing-md);
 }
 
-.card {
+/* ==================== 区块卡片 ==================== */
+.section-card {
   background: var(--color-card);
   border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
   box-shadow: var(--shadow-card);
 }
 
-.mt-md {
-  margin-top: var(--spacing-md);
-}
-
-.card-title {
-  font-size: var(--font-size-sm);
+.section-label {
+  display: block;
+  font-size: var(--font-size-xs);
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   margin-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1rpx solid var(--color-border);
 }
 
+/* ==================== 设置项 ==================== */
 .setting-item {
   display: flex;
   flex-direction: row;
@@ -39,66 +45,82 @@
 }
 
 .setting-item:active {
-  background: var(--color-bg);
-  margin: 0 calc(-1 * var(--spacing-lg));
-  padding-left: var(--spacing-lg);
-  padding-right: var(--spacing-lg);
+  opacity: 0.7;
 }
 
 .si-left {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .si-label {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  flex-shrink: 0;
-  margin-right: var(--spacing-md);
+  font-weight: 500;
 }
 
-.si-value {
+.si-hint {
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
   margin-top: 4rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;
 }
 
 .si-action {
   font-size: var(--font-size-sm);
   color: var(--color-primary);
+  font-weight: 500;
   flex-shrink: 0;
 }
 
 .si-arrow {
   font-size: var(--font-size-xl);
-  color: var(--color-text-secondary);
+  color: var(--color-text-disabled);
   flex-shrink: 0;
+}
+
+/* 输入框 */
+.si-input-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 .si-input {
   width: 80rpx;
-  height: 60rpx;
+  height: 64rpx;
   text-align: center;
   background: var(--color-bg);
   border-radius: var(--radius-sm);
-  border: 1rpx solid var(--color-border);
-  font-size: var(--font-size-md);
+  border: 2rpx solid var(--color-border);
+  font-size: var(--font-size-base);
   color: var(--color-text-primary);
+  transition: border-color 0.2s;
+}
+
+.si-input:focus {
+  border-color: var(--color-primary);
+}
+
+.si-input-sm {
+  width: 100rpx;
+}
+
+.si-input-wide {
+  width: 280rpx;
+  height: 64rpx;
+  text-align: left;
+  padding: 0 var(--spacing-sm);
 }
 
 .si-unit {
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  margin-left: var(--spacing-xs);
+  color: var(--color-text-helper);
 }
 
-/* 帮助文本 */
-/* 用户头像（Bug 11 修复） */
+/* ==================== 用户头像 ==================== */
 .user-profile {
   padding: var(--spacing-md) 0;
 }
@@ -118,77 +140,29 @@
 }
 
 .user-avatar {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: var(--radius-round);
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
   flex-shrink: 0;
   display: block;
+  border: 4rpx solid var(--color-primary-soft);
 }
 
 .user-avatar-placeholder {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: var(--radius-round);
-  background: var(--color-bg);
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: var(--color-primary-light);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
   flex-shrink: 0;
 }
 
-.si-input-wide {
-  width: 260rpx;
-  height: 60rpx;
-  text-align: left;
-  padding: 0 var(--spacing-sm);
-  background: var(--color-bg);
-  border-radius: var(--radius-sm);
-  border: 1rpx solid var(--color-border);
-  font-size: var(--font-size-md);
-  color: var(--color-text-primary);
+.avatar-icon {
+  font-size: 44rpx;
 }
 
-/* 帮助文本 */
-.help-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.help-text text {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-}
-
-/* 关于栏 - 独立样式，解决间距问题 */
-.about-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: var(--spacing-md) 0;
-  border-bottom: 1rpx solid var(--color-border);
-}
-
-.about-item:last-child {
-  border-bottom: none;
-}
-
-.about-label {
-  font-size: var(--font-size-md);
-  color: var(--color-text-primary);
-  width: 160rpx;
-  flex-shrink: 0;
-}
-
-.about-value {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  flex: 1;
-}
-
-/* 用户资料行 - 防止溢出 */
 .user-profile .si-left {
   min-width: 0;
   overflow: hidden;
@@ -203,6 +177,69 @@
   max-width: 400rpx;
 }
 
+/* ==================== 关于 ==================== */
+.about-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.about-row:last-child {
+  border-bottom: none;
+}
+
+.about-label {
+  width: 140rpx;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.about-value {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+/* ==================== 使用说明 ==================== */
+.help-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.help-item {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.help-num {
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 22rpx;
+  font-weight: 600;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 2rpx;
+}
+
+.help-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* ==================== 底部 ==================== */
 .safe-bottom {
   height: 80rpx;
 }

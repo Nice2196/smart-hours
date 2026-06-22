@@ -1,13 +1,15 @@
 /**
  * 课程编辑页样式
+ * 设计语言：「墨蓝 · 纸白」
  */
+
 .page-container {
   min-height: 100vh;
   background-color: var(--color-bg);
   padding-bottom: 60rpx;
 }
 
-/* Tab 切换 */
+/* ==================== Tab 切换 ==================== */
 .tab-bar {
   display: flex;
   flex-direction: row;
@@ -17,25 +19,36 @@
 
 .tab-item {
   flex: 1;
+  position: relative;
   text-align: center;
   padding: var(--spacing-md);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
-  border-bottom: 4rpx solid transparent;
-  transition: all 0.2s;
+  font-weight: 500;
+  transition: color 0.2s var(--ease-out);
 }
 
 .tab-item.active {
   color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
   font-weight: 600;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 25%;
+  right: 25%;
+  height: 4rpx;
+  background: var(--color-primary);
+  border-radius: 2rpx 2rpx 0 0;
 }
 
 .tab-content {
   padding: var(--spacing-md);
 }
 
-/* 表单卡片 */
+/* ==================== 表单卡片 ==================== */
 .form-card {
   background: var(--color-card);
   border-radius: var(--radius-md);
@@ -45,7 +58,7 @@
 }
 
 .card-title {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text-primary);
   margin-bottom: var(--spacing-md);
@@ -54,12 +67,13 @@
 }
 
 .form-group {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .form-label {
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
+  font-weight: 500;
   margin-bottom: var(--spacing-xs);
   display: flex;
   flex-direction: row;
@@ -73,74 +87,103 @@
 
 .form-input {
   width: 100%;
-  height: 80rpx;
-  padding: 0 var(--spacing-sm);
+  height: 88rpx;
+  padding: 0 var(--spacing-md);
   background: var(--color-bg);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  border: 1rpx solid var(--color-border);
+  border: 2rpx solid var(--color-border);
+  transition: border-color 0.2s var(--ease-out);
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-card);
 }
 
 .form-textarea {
   width: 100%;
-  min-height: 120rpx;
-  padding: var(--spacing-sm);
+  min-height: 140rpx;
+  padding: var(--spacing-md);
   background: var(--color-bg);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  border: 1rpx solid var(--color-border);
+  border: 2rpx solid var(--color-border);
+  transition: border-color 0.2s var(--ease-out);
+}
+
+.form-textarea:focus {
+  border-color: var(--color-primary);
+  background: var(--color-card);
 }
 
 .form-picker {
   width: 100%;
-  height: 80rpx;
-  padding: 0 var(--spacing-sm);
+  height: 88rpx;
+  padding: 0 var(--spacing-md);
   background: var(--color-bg);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  border: 1rpx solid var(--color-border);
+  border: 2rpx solid var(--color-border);
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  transition: border-color 0.2s var(--ease-out);
+}
+
+.form-picker:active {
+  border-color: var(--color-primary);
 }
 
 .picker-arrow {
   font-size: var(--font-size-xl);
-  color: var(--color-text-secondary);
+  color: var(--color-text-disabled);
 }
 
-/* 提交按钮 */
+/* ==================== 提交按钮 ==================== */
 .submit-section {
   padding: var(--spacing-md) 0;
 }
 
 .btn {
   width: 100%;
-  height: 88rpx;
+  height: 96rpx;
   border-radius: var(--radius-md);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
+  letter-spacing: 0.04em;
+  transition: all 0.15s var(--ease-out);
+}
+
+.btn:active {
+  transform: scale(0.97);
 }
 
 .btn-primary {
   background: var(--color-primary);
-  color: #fff;
+  color: #FFFFFF;
+  box-shadow: 0 4rpx 14rpx rgba(79, 70, 229, 0.25);
 }
 
 .btn-outline {
   background: var(--color-card);
   color: var(--color-primary);
-  border: 1rpx solid var(--color-primary);
+  border: 2rpx solid var(--color-primary-soft);
 }
 
-/* 排课列表 */
+.btn-outline:active {
+  background: var(--color-primary-light);
+}
+
+/* ==================== 排课列表 ==================== */
 .schedule-list {
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
@@ -164,73 +207,69 @@
   color: var(--color-text-primary);
   font-weight: 500;
   flex-shrink: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .si-time {
   flex: 1;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .si-status {
   font-size: var(--font-size-xs);
   padding: 2rpx 12rpx;
-  border-radius: var(--radius-round);
+  border-radius: 6rpx;
   margin-right: var(--spacing-sm);
+  font-weight: 500;
 }
 
 .si-status.active {
   color: var(--color-success);
-  background: rgba(82, 196, 26, 0.1);
+  background: var(--color-success-light);
 }
 
 .si-status.paused {
   color: var(--color-warning);
-  background: rgba(250, 173, 20, 0.1);
+  background: var(--color-warning-light);
 }
 
 .si-delete {
-  width: 60rpx;
-  height: 60rpx;
+  width: 56rpx;
+  height: 56rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-expired);
-  font-size: var(--font-size-md);
-  border-radius: var(--radius-round);
+  font-size: var(--font-size-base);
+  border-radius: 50%;
 }
 
 .si-delete:active {
-  background: rgba(255, 77, 79, 0.1);
+  background: var(--color-expired-light);
 }
 
-/* 星期多选 checkbox 组 */
+/* ==================== 星期多选 ==================== */
 .weekday-checkbox-group {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 12rpx;
+  gap: var(--spacing-sm);
 }
 
 .weekday-checkbox {
-  padding: 12rpx 28rpx;
+  padding: 14rpx 28rpx;
   background: var(--color-bg);
   border: 2rpx solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  transition: all 0.2s;
+  font-weight: 500;
+  transition: all 0.2s var(--ease-out);
 }
 
 .weekday-checkbox.checked {
   background: var(--color-primary-light);
   border-color: var(--color-primary);
   color: var(--color-primary);
-  font-weight: 500;
+  font-weight: 600;
 }

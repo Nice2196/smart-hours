@@ -1,66 +1,69 @@
-<!-- 课程详情页 -->
+<!--
+  课程详情页
+  设计语言：「墨蓝 · 纸白」
+-->
 <view class="page-container" wx:if="{{!loading && course}}">
 
-  <!-- ==================== 课程基本信息卡片 ==================== -->
-  <view class="card info-card">
+  <!-- ==================== 课程信息卡片 ==================== -->
+  <view class="info-card card-accent card-status-{{course.status}}">
     <view class="card-header">
-      <view class="course-name">{{course.name}}</view>
-      <view class="status-tag {{course.status}}">{{courseStatusLabel}}</view>
+      <text class="course-name">{{course.name}}</text>
+      <view class="tag tag-{{course.status}}">{{courseStatusLabel}}</view>
     </view>
 
-    <!-- 进度条 -->
+    <!-- 进度区 -->
     <view class="progress-section">
-      <view class="progress-bar">
+      <view class="progress-track">
         <view class="progress-fill" style="width: {{course.consumedHours / course.totalHours * 100}}%"></view>
       </view>
       <view class="progress-text">
-        <text>已消耗 {{course.consumedHours || 0}} 课时</text>
-        <text>剩余 {{course.remainingHours}} / 总计 {{course.totalHours}} 课时</text>
+        <text class="progress-consumed">已消耗 {{course.consumedHours || 0}} 课时</text>
+        <text class="progress-remaining">剩余 {{course.remainingHours}} / 总计 {{course.totalHours}}</text>
       </view>
     </view>
 
     <!-- 详情信息 -->
-    <view class="info-rows">
-      <view class="info-row">
+    <view class="info-grid">
+      <view class="info-item">
         <text class="info-label">科目</text>
         <text class="info-value">{{course._subjectLabel}}</text>
       </view>
-      <view class="info-row">
+      <view class="info-item">
         <text class="info-label">类型</text>
         <text class="info-value">{{course._courseTypeLabel}}</text>
       </view>
-      <view class="info-row">
+      <view class="info-item">
         <text class="info-label">学生</text>
         <text class="info-value">{{course.student || '-'}}</text>
       </view>
-      <view class="info-row">
+      <view class="info-item">
         <text class="info-label">老师</text>
         <text class="info-value">{{course.teacher || '-'}}</text>
       </view>
-      <view class="info-row">
-        <text class="info-label">每次扣课时</text>
+      <view class="info-item">
+        <text class="info-label">每次扣课</text>
         <text class="info-value">{{course.deductionUnit || 1}} 课时</text>
       </view>
-      <view class="info-row" wx:if="{{course._startDate}}">
+      <view class="info-item" wx:if="{{course._startDate}}">
         <text class="info-label">开始日期</text>
         <text class="info-value">{{course._startDate}}</text>
       </view>
-      <view class="info-row" wx:if="{{course._expiryDate}}">
+      <view class="info-item" wx:if="{{course._expiryDate}}">
         <text class="info-label">过期日期</text>
         <text class="info-value">{{course._expiryDate}}</text>
       </view>
-      <view class="info-row" wx:if="{{course.notes}}">
+      <view class="info-item info-item-full" wx:if="{{course.notes}}">
         <text class="info-label">备注</text>
         <text class="info-value">{{course.notes}}</text>
       </view>
     </view>
   </view>
 
-  <!-- ==================== 固定排课列表 ==================== -->
-  <view class="card schedule-card">
-    <view class="section-title">
-      <text>固定排课</text>
-      <text class="add-schedule-btn" bindtap="onAddSchedule">+ 添加</text>
+  <!-- ==================== 固定排课 ==================== -->
+  <view class="section-card">
+    <view class="section-header">
+      <text class="section-title">固定排课</text>
+      <text class="section-action" bindtap="onAddSchedule">+ 添加</text>
     </view>
 
     <view wx:if="{{schedules.length > 0}}">
@@ -72,42 +75,40 @@
         bindtap="onEditSchedule"
       >
         <view class="schedule-weekday">
-          <text class="weekday-label">{{item.weekdayLabel}}</text>
+          <text class="weekday-badge">{{item.weekdayLabel}}</text>
         </view>
-        <view class="schedule-time">
-          <text>{{item.time}}</text>
-        </view>
-        <view class="schedule-status {{item.status}}">
+        <text class="schedule-time">{{item.time}}</text>
+        <view class="tag tag-{{item.status === 'active' ? 'success' : 'warning'}}">
           {{item.status === 'active' ? '启用' : '暂停'}}
         </view>
       </view>
     </view>
 
-    <view class="empty-schedule" wx:else>
-      <text>暂未设置固定排课</text>
-      <text class="sub-text">设置后可按周期自动消课</text>
+    <view class="empty-hint" wx:else>
+      <text class="empty-hint-text">暂未设置固定排课</text>
+      <text class="empty-hint-sub">设置后可按周期自动消课</text>
     </view>
   </view>
 
   <!-- ==================== 操作按钮组 ==================== -->
-  <view class="action-buttons">
-    <button class="btn btn-primary" bindtap="onQuickDeduct">
-      📝 手动消课
+  <view class="action-group">
+    <button class="btn btn-primary btn-block" bindtap="onQuickDeduct">
+      手动消课
     </button>
-    <button class="btn btn-outline" bindtap="onViewLessons">
-      📋 消课记录
+    <button class="btn btn-outline btn-block" bindtap="onViewLessons">
+      消课记录
     </button>
-    <button class="btn btn-outline" bindtap="onEdit">
-      ✏️ 编辑课程
+    <button class="btn btn-outline btn-block" bindtap="onEdit">
+      编辑课程
     </button>
     <button
-      class="btn btn-outline {{course.status === 'active' ? 'btn-warning' : 'btn-success'}}"
+      class="btn btn-outline btn-block {{course.status === 'active' ? 'btn-warning-outline' : 'btn-success-outline'}}"
       bindtap="onToggleStatus"
     >
-      {{course.status === 'active' ? '⏸ 暂停课程' : '▶️ 恢复课程'}}
+      {{course.status === 'active' ? '暂停课程' : '恢复课程'}}
     </button>
-    <button class="btn btn-outline btn-danger" bindtap="onDelete">
-      🗑 删除课程
+    <button class="btn btn-ghost btn-block btn-danger-text" bindtap="onDelete">
+      删除课程
     </button>
   </view>
 
@@ -124,6 +125,7 @@
 
 <!-- 加载中 -->
 <view class="loading-container" wx:if="{{loading}}">
+  <view class="loading-spinner"></view>
   <text class="loading-text">加载中...</text>
 </view>
 

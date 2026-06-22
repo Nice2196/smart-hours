@@ -1,5 +1,6 @@
 /**
  * 骨架屏组件样式
+ * 设计语言：「墨蓝 · 纸白」
  */
 .skeleton-container {
   padding: var(--spacing-md);
@@ -19,7 +20,7 @@
 /* 通用骨架条 */
 .sk-line {
   height: 28rpx;
-  background: #E8E8E8;
+  background: var(--color-border);
   border-radius: 6rpx;
   margin-bottom: var(--spacing-sm);
 }
@@ -36,7 +37,7 @@
 
 .sk-bar {
   height: 12rpx;
-  background: #E8E8E8;
+  background: var(--color-border);
   border-radius: 6rpx;
   margin-bottom: var(--spacing-sm);
 }
@@ -62,7 +63,7 @@
   width: 72rpx;
   height: 72rpx;
   border-radius: var(--radius-round);
-  background: #E8E8E8;
+  background: var(--color-border);
   margin-right: var(--spacing-md);
   flex-shrink: 0;
 }

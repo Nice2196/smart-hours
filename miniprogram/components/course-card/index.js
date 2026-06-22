@@ -1,11 +1,10 @@
 /**
  * 课程卡片组件
  *
- * 展示课程基本信息、进度条、状态标签。
+ * 展示课程基本信息、左侧色带状态、环形进度。
  *
  * @component course-card
- * @responsible MiMo-V2.5 Pro
- * @phase Phase 5
+ * @design-system v2.0 墨蓝·纸白
  */
 
 const { COURSE_STATUS_LABELS, SUBJECT_LABELS, COURSE_TYPE_LABELS } = require('../../utils/constants')
@@ -28,7 +27,18 @@ Component({
         const statusLabel = COURSE_STATUS_LABELS[course.status] || course.status
         const subjectLabel = SUBJECT_LABELS[course.subject] || course.subject || ''
         const courseTypeLabel = COURSE_TYPE_LABELS[course.courseType] || course.courseType || ''
-        this.setData({ progressPercent, statusLabel, subjectLabel, courseTypeLabel })
+
+        // 判断是否即将过期（30天内）
+        let isExpiring = false
+        if (course.expiryDate) {
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)
+          const expiry = new Date(course.expiryDate)
+          const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24))
+          isExpiring = diffDays <= 30 && diffDays >= 0
+        }
+
+        this.setData({ progressPercent, statusLabel, subjectLabel, courseTypeLabel, isExpiring })
       }
     }
   },
@@ -37,12 +47,13 @@ Component({
     progressPercent: 0,
     statusLabel: '',
     subjectLabel: '',
-    courseTypeLabel: ''
+    courseTypeLabel: '',
+    isExpiring: false
   },
 
   methods: {
     /**
-     * 点击卡片
+     * 点击卡片 → 课程详情
      */
     onTap() {
       const course = this.data.course

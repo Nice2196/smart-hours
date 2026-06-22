@@ -1,28 +1,41 @@
 /**
  * 空状态组件样式
+ * 设计语言：「墨蓝 · 纸白」
  */
+
 .empty-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xxl) var(--spacing-lg);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.empty-icon-wrap {
+  width: 120rpx;
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary-light);
+  border-radius: 50%;
+  margin-bottom: var(--spacing-md);
 }
 
 .empty-icon {
-  font-size: 80rpx;
-  margin-bottom: var(--spacing-md);
-  opacity: 0.6;
+  font-size: 56rpx;
+  opacity: 0.8;
 }
 
 .empty-text {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
+  font-weight: 500;
   text-align: center;
 }
 
 .empty-sub {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   color: var(--color-text-helper);
   text-align: center;
   margin-top: var(--spacing-xs);
@@ -31,12 +44,15 @@
 .empty-action {
   margin-top: var(--spacing-lg);
   padding: var(--spacing-sm) var(--spacing-xl);
-  border-radius: var(--radius-round);
+  border-radius: var(--radius-md);
   background: var(--color-primary);
-  color: #fff;
+  color: #FFFFFF;
   font-size: var(--font-size-sm);
+  font-weight: 500;
+  box-shadow: 0 4rpx 12rpx rgba(79, 70, 229, 0.2);
 }
 
 .empty-action:active {
-  opacity: 0.8;
+  opacity: 0.85;
+  transform: scale(0.97);
 }

@@ -1,20 +1,21 @@
 /**
  * 日历网格组件样式
+ * 设计语言：「墨蓝 · 纸白」
  */
+
 .calendar-grid {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  padding: 4rpx;
+  padding: var(--spacing-xs);
   background: var(--color-card);
 }
 
 .cell-wrapper {
   width: calc(100% / 7);
-  /* 维持正方形 */
   aspect-ratio: 1;
   box-sizing: border-box;
-  padding: 2rpx;
+  padding: 3rpx;
 }
 
 .cell {
@@ -27,7 +28,7 @@
 }
 
 .cell-other-month {
-  opacity: 0.3;
+  opacity: 0.25;
 }
 
 .cell-inner {
@@ -39,28 +40,23 @@
   justify-content: center;
   border-radius: var(--radius-sm);
   position: relative;
+  transition: background 0.15s;
 }
 
 .cell-inner.today {
-  background: rgba(24, 144, 255, 0.08);
+  background: var(--color-primary-light);
   border: 2rpx solid var(--color-primary);
 }
 
-/* ==================== 状态颜色边框 ==================== */
-.cell-inner.today[data-status="completed"] {
-  background: rgba(82, 196, 26, 0.08);
-  border-color: var(--color-success);
-}
-
-.cell-inner.today[data-status="expired"] {
-  background: rgba(255, 77, 79, 0.08);
-  border-color: var(--color-expired);
+.cell-inner.has-lessons:not(.today) {
+  background: rgba(79, 70, 229, 0.04);
 }
 
 .cell-day {
   font-size: 26rpx;
   color: var(--color-text-primary);
   font-weight: 500;
+  line-height: 1.2;
 }
 
 .today-text {
@@ -68,25 +64,26 @@
   color: var(--color-primary);
 }
 
-/* 课程标记 */
+/* ==================== 课程标记 ==================== */
 .cell-dots {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 2rpx;
-}
-
-.dot-row {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 2rpx;
+  gap: 4rpx;
+  margin-top: 4rpx;
+}
+
+.dots-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3rpx;
 }
 
 .dot {
-  width: 10rpx;
-  height: 10rpx;
-  border-radius: var(--radius-round);
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
@@ -104,14 +101,7 @@
 
 .cell-count {
   font-size: 16rpx;
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
   line-height: 1;
-  margin-left: 2rpx;
-}
-
-.cell-deduct-type {
-  font-size: 14rpx;
-  color: var(--color-text-secondary);
-  line-height: 1;
-  margin-top: 2rpx;
+  font-weight: 500;
 }

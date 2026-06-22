@@ -1,12 +1,14 @@
 /**
  * 操作日志页样式
+ * 设计语言：「墨蓝 · 纸白」
  */
+
 .page-container {
   min-height: 100vh;
   background-color: var(--color-bg);
 }
 
-/* 筛选栏 */
+/* ==================== 筛选栏 ==================== */
 .filter-bar {
   background: var(--color-card);
   padding: var(--spacing-sm) var(--spacing-lg);
@@ -28,7 +30,7 @@
 
 .filter-count {
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
   margin-left: auto;
 }
 
@@ -45,19 +47,20 @@
 
 .form-label {
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
   margin-bottom: 4rpx;
+  font-weight: 500;
 }
 
 .form-picker {
   width: 100%;
-  height: 64rpx;
+  height: 72rpx;
   padding: 0 var(--spacing-sm);
   background: var(--color-bg);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
-  border: 1rpx solid var(--color-border);
+  border: 2rpx solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -65,6 +68,7 @@
 
 .picker-arrow {
   font-size: var(--font-size-lg);
+  color: var(--color-text-disabled);
 }
 
 .filter-actions {
@@ -76,13 +80,19 @@
 
 .btn-filter {
   flex: 1;
-  height: 64rpx;
-  border-radius: var(--radius-sm);
+  height: 72rpx;
+  border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
+  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
+  transition: all 0.15s var(--ease-out);
+}
+
+.btn-filter:active {
+  transform: scale(0.97);
 }
 
 .btn-reset {
@@ -92,10 +102,10 @@
 
 .btn-apply {
   background: var(--color-primary);
-  color: #fff;
+  color: #FFFFFF;
 }
 
-/* 日志列表 */
+/* ==================== 日志列表 ==================== */
 .log-list {
   padding: var(--spacing-sm) 0;
 }
@@ -104,12 +114,13 @@
   background: var(--color-card);
   margin: var(--spacing-xs) var(--spacing-md);
   padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border-left: 4rpx solid var(--color-border);
 }
 
 .log-item:active {
-  background: var(--color-bg);
+  opacity: 0.8;
 }
 
 .log-header {
@@ -120,17 +131,18 @@
 }
 
 .log-action-tag {
-  font-size: var(--font-size-xs);
+  font-size: 22rpx;
   padding: 2rpx 8rpx;
-  background: var(--color-bg);
-  border-radius: var(--radius-xs);
-  color: var(--color-text-primary);
+  background: var(--color-primary-light);
+  border-radius: 4rpx;
+  color: var(--color-primary);
   margin-right: var(--spacing-xs);
   max-width: 160rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   flex-shrink: 0;
+  font-weight: 500;
 }
 
 .log-course {
@@ -144,25 +156,26 @@
 }
 
 .log-trigger-tag {
-  font-size: var(--font-size-xs);
+  font-size: 22rpx;
   padding: 2rpx 8rpx;
-  border-radius: var(--radius-xs);
+  border-radius: 4rpx;
   margin-left: var(--spacing-xs);
+  font-weight: 500;
 }
 
 .log-trigger-tag.manual {
-  color: #722ED1;
-  background: rgba(114, 46, 209, 0.08);
+  color: #7C3AED;
+  background: #EDE9FE;
 }
 
 .log-trigger-tag.auto_scheduler {
   color: var(--color-primary);
-  background: rgba(24, 144, 255, 0.08);
+  background: var(--color-pending-light);
 }
 
 .log-time {
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
 }
 
 /* 加载更多 */
@@ -170,17 +183,18 @@
   text-align: center;
   padding: var(--spacing-lg);
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
 }
 
 .loading-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-2xl);
 }
 
 .loading-text {
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
   font-size: var(--font-size-sm);
 }

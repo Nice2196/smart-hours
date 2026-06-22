@@ -1,7 +1,9 @@
-<!-- 日历网格组件 -->
+<!--
+  日历网格组件
+  设计语言：「墨蓝 · 纸白」
+-->
 <view class="calendar-grid">
 
-  <!-- 网格线 7x6 -->
   <view
     class="cell-wrapper"
     wx:for="{{cells}}"
@@ -9,36 +11,20 @@
     data-date="{{item.date}}"
     bindtap="onDayTap"
   >
-    <!-- 非当月格：半透明 -->
     <view class="cell {{item.isCurrentMonth ? '' : 'cell-other-month'}}">
-
-      <!-- 今日标记 -->
-      <view class="cell-inner {{item.isToday ? 'today' : ''}}">
+      <view class="cell-inner {{item.isToday ? 'today' : ''}} {{item.info && item.info.lessonCount > 0 ? 'has-lessons' : ''}}">
 
         <!-- 日期数字 -->
         <text class="cell-day {{item.isToday ? 'today-text' : ''}}">{{item.day}}</text>
 
         <!-- 课程标记点 -->
         <view class="cell-dots" wx:if="{{item.info && item.info.lessonCount > 0}}">
-          <!-- 已完成（绿色点） -->
-          <view class="dot-row" wx:if="{{item.info.completedCount > 0}}">
-            <view class="dot dot-completed"></view>
-            <text class="cell-count" wx:if="{{item.info.completedCount > 1}}">{{item.info.completedCount}}</text>
+          <view class="dots-row">
+            <view class="dot dot-completed" wx:if="{{item.info.completedCount > 0}}"></view>
+            <view class="dot dot-pending" wx:if="{{item.info.pendingCount > 0}}"></view>
+            <view class="dot dot-expired" wx:if="{{item.info.expiredCount > 0}}"></view>
           </view>
-          <!-- 待上课（蓝色点） -->
-          <view class="dot-row" wx:if="{{item.info.pendingCount > 0}}">
-            <view class="dot dot-pending"></view>
-            <text class="cell-count" wx:if="{{item.info.pendingCount > 1}}">{{item.info.pendingCount}}</text>
-          </view>
-          <!-- 已过期（红色点） -->
-          <view class="dot-row" wx:if="{{item.info.expiredCount > 0}}">
-            <view class="dot dot-expired"></view>
-            <text class="cell-count" wx:if="{{item.info.expiredCount > 1}}">{{item.info.expiredCount}}</text>
-          </view>
-          <!-- 自动/手动消课标签 -->
-          <text class="cell-deduct-type" wx:if="{{item.info.completedCount > 0}}">
-            {{item.info.autoDeductCount > 0 ? ('自' + item.info.autoDeductCount) : ''}}{{item.info.autoDeductCount > 0 && item.info.manualDeductCount > 0 ? '/' : ''}}{{item.info.manualDeductCount > 0 ? ('手' + item.info.manualDeductCount) : ''}}
-          </text>
+          <text class="cell-count" wx:if="{{item.info.lessonCount > 1}}">{{item.info.lessonCount}}</text>
         </view>
 
       </view>

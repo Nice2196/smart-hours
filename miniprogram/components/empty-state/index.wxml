@@ -1,6 +1,11 @@
-<!-- 空状态组件 -->
+<!--
+  空状态组件
+  设计语言：「墨蓝 · 纸白」
+-->
 <view class="empty-container">
-  <text class="empty-icon">{{icon}}</text>
+  <view class="empty-icon-wrap">
+    <text class="empty-icon">{{icon}}</text>
+  </view>
   <text class="empty-text">{{text}}</text>
   <text class="empty-sub" wx:if="{{subText}}">{{subText}}</text>
   <view class="empty-action" wx:if="{{actionText}}" bindtap="onAction">

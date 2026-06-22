@@ -1,31 +1,35 @@
 /**
  * 消课记录列表页样式
+ * 设计语言：「墨蓝 · 纸白」
  */
+
 .page-container {
   min-height: 100vh;
   background-color: var(--color-bg);
   padding: var(--spacing-md);
 }
 
+/* 课程头部 */
 .course-header {
   background: var(--color-card);
   border-radius: var(--radius-md);
   padding: var(--spacing-md) var(--spacing-lg);
   margin-bottom: var(--spacing-md);
   box-shadow: var(--shadow-card);
+  border-left: 6rpx solid var(--color-primary);
 }
 
 .course-title {
   font-size: var(--font-size-lg);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text-primary);
   display: block;
 }
 
 .lesson-count {
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  margin-top: var(--spacing-xs);
+  color: var(--color-text-helper);
+  margin-top: 4rpx;
   display: block;
 }
 
@@ -46,37 +50,38 @@
 }
 
 .lesson-date {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text-primary);
   flex: 1;
 }
 
 .lesson-tag {
-  font-size: var(--font-size-xs);
-  padding: 2rpx 12rpx;
-  border-radius: var(--radius-round);
+  font-size: 22rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 4rpx;
   margin-left: var(--spacing-xs);
+  font-weight: 500;
 }
 
 .lesson-tag.auto {
   color: var(--color-primary);
-  background: rgba(24, 144, 255, 0.1);
+  background: var(--color-pending-light);
 }
 
 .lesson-tag.manual {
-  color: #722ED1;
-  background: rgba(114, 46, 209, 0.1);
+  color: #7C3AED;
+  background: #EDE9FE;
 }
 
 .lesson-tag.completed {
   color: var(--color-success);
-  background: rgba(82, 196, 26, 0.1);
+  background: var(--color-success-light);
 }
 
 .lesson-tag.cancelled {
   color: var(--color-expired);
-  background: rgba(255, 77, 79, 0.1);
+  background: var(--color-expired-light);
 }
 
 .lesson-body {
@@ -99,7 +104,7 @@
 
 .lb-time {
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
   margin-top: 4rpx;
 }
 
@@ -111,7 +116,7 @@
 .lb-notes {
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
-  line-height: 1.4;
+  line-height: 1.5;
   word-break: break-all;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -131,40 +136,41 @@
 
 .lf-balance {
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
 }
 
 .lf-cancel-btn {
   font-size: var(--font-size-xs);
   color: var(--color-expired);
-  padding: 4rpx 20rpx;
-  border: 1rpx solid var(--color-expired);
-  border-radius: var(--radius-round);
+  padding: 6rpx 20rpx;
+  border: 2rpx solid var(--color-expired);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
 }
 
 .lf-cancel-btn:active {
-  background: rgba(255, 77, 79, 0.1);
+  background: var(--color-expired-light);
 }
 
 .loading-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-2xl);
 }
 
 .loading-text {
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
   font-size: var(--font-size-sm);
 }
 
-/* 加载失败 */
 .error-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-2xl);
   gap: var(--spacing-md);
 }
 
@@ -177,14 +183,15 @@
   font-size: var(--font-size-sm);
   color: var(--color-primary);
   background: transparent;
-  border: 1rpx solid var(--color-primary);
-  border-radius: var(--radius-sm);
-  padding: 8rpx 40rpx;
+  border: 2rpx solid var(--color-primary-soft);
+  border-radius: var(--radius-md);
+  padding: 10rpx 40rpx;
   line-height: 1.5;
+  font-weight: 500;
 }
 
 .btn-retry:active {
-  background: rgba(24, 144, 255, 0.1);
+  background: var(--color-primary-light);
 }
 
 .safe-bottom {

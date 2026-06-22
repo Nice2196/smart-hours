@@ -1,16 +1,39 @@
 /**
  * 课程详情页样式
+ * 设计语言：「墨蓝 · 纸白」
  */
+
 .page-container {
   min-height: 100vh;
   background-color: var(--color-bg);
   padding: var(--spacing-md);
 }
 
-/* 课程信息卡片 */
+/* ==================== 信息卡片 ==================== */
 .info-card {
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
   padding: var(--spacing-lg);
+  padding-left: calc(var(--spacing-lg) + 6rpx);
   margin-bottom: var(--spacing-md);
+  border-left: 6rpx solid var(--color-primary);
+}
+
+.card-status-active {
+  border-left-color: var(--color-success);
+}
+
+.card-status-paused {
+  border-left-color: var(--color-warning);
+}
+
+.card-status-completed {
+  border-left-color: var(--color-primary);
+}
+
+.card-status-expired {
+  border-left-color: var(--color-expired);
 }
 
 .card-header {
@@ -31,112 +54,149 @@
   white-space: nowrap;
 }
 
-.status-tag {
+/* 标签 */
+.tag {
   font-size: var(--font-size-xs);
-  padding: 4rpx 16rpx;
-  border-radius: var(--radius-round);
+  padding: 4rpx 14rpx;
+  border-radius: 6rpx;
   margin-left: var(--spacing-sm);
   flex-shrink: 0;
+  font-weight: 500;
 }
 
-.status-tag.active {
+.tag-active {
   color: var(--color-success);
-  background: rgba(82, 196, 26, 0.1);
+  background: var(--color-success-light);
 }
 
-.status-tag.paused {
+.tag-paused {
   color: var(--color-warning);
-  background: rgba(250, 173, 20, 0.1);
+  background: var(--color-warning-light);
 }
 
-.status-tag.completed {
+.tag-completed {
   color: var(--color-primary);
-  background: rgba(24, 144, 255, 0.1);
+  background: var(--color-pending-light);
 }
 
-.status-tag.expired {
+.tag-expired {
   color: var(--color-expired);
-  background: rgba(255, 77, 79, 0.1);
+  background: var(--color-expired-light);
 }
 
-/* 进度条 */
+.tag-success {
+  color: var(--color-success);
+  background: var(--color-success-light);
+}
+
+/* ==================== 进度条 ==================== */
 .progress-section {
   margin-bottom: var(--spacing-lg);
 }
 
-.progress-bar {
-  height: 12rpx;
+.progress-track {
+  height: 10rpx;
   background: var(--color-border);
-  border-radius: 6rpx;
+  border-radius: 5rpx;
   overflow: hidden;
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 8rpx;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(to right, var(--color-primary), var(--color-success));
-  border-radius: 6rpx;
-  transition: width 0.3s ease;
+  background: var(--color-success);
+  border-radius: 5rpx;
+  transition: width 0.5s var(--ease-out);
+}
+
+.card-status-paused .progress-fill {
+  background: var(--color-warning);
+}
+
+.card-status-expired .progress-fill {
+  background: var(--color-expired);
 }
 
 .progress-text {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.progress-consumed {
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
 }
 
-/* 详情行 */
-.info-rows {
+.progress-remaining {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-helper);
+}
+
+/* ==================== 详情信息 ==================== */
+.info-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
   border-top: 1rpx solid var(--color-border);
   padding-top: var(--spacing-md);
 }
 
-.info-row {
+.info-item {
+  width: calc(50% - var(--spacing-sm) / 2);
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: var(--spacing-xs) 0;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.info-item-full {
+  width: 100%;
 }
 
 .info-label {
-  width: 140rpx;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-helper);
+  letter-spacing: 0.04em;
 }
 
 .info-value {
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-weight: 500;
 }
 
-/* 固定排课 */
-.schedule-card {
+/* ==================== 排课卡片 ==================== */
+.section-card {
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
 }
 
-.section-title {
+.section-header {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  font-size: var(--font-size-md);
-  font-weight: 600;
-  color: var(--color-text-primary);
   margin-bottom: var(--spacing-md);
 }
 
-.add-schedule-btn {
+.section-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.section-action {
   font-size: var(--font-size-sm);
   color: var(--color-primary);
-  font-weight: 400;
+  font-weight: 500;
+}
+
+.section-action:active {
+  opacity: 0.7;
 }
 
 .schedule-item {
@@ -145,6 +205,7 @@
   align-items: center;
   padding: var(--spacing-sm) 0;
   border-bottom: 1rpx solid var(--color-border);
+  gap: var(--spacing-sm);
 }
 
 .schedule-item:last-child {
@@ -152,119 +213,135 @@
 }
 
 .schedule-item:active {
-  background: var(--color-bg);
-  margin: 0 calc(-1 * var(--spacing-lg));
-  padding-left: var(--spacing-lg);
-  padding-right: var(--spacing-lg);
+  opacity: 0.7;
 }
 
 .schedule-weekday {
-  width: 80rpx;
+  flex-shrink: 0;
 }
 
-.weekday-label {
-  font-size: var(--font-size-md);
+.weekday-badge {
+  display: inline-block;
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 4rpx 16rpx;
+  border-radius: var(--radius-sm);
 }
 
 .schedule-time {
   flex: 1;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.schedule-status {
-  font-size: var(--font-size-xs);
-  padding: 2rpx 12rpx;
-  border-radius: var(--radius-round);
-}
-
-.schedule-status.active {
-  color: var(--color-success);
-  background: rgba(82, 196, 26, 0.1);
-}
-
-.schedule-status.paused {
-  color: var(--color-warning);
-  background: rgba(250, 173, 20, 0.1);
-}
-
-.empty-schedule {
-  text-align: center;
+.empty-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: var(--spacing-xl) 0;
-  color: var(--color-text-secondary);
+}
+
+.empty-hint-text {
   font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
 }
 
-.empty-schedule .sub-text {
-  display: block;
+.empty-hint-sub {
   font-size: var(--font-size-xs);
-  margin-top: var(--spacing-xs);
+  color: var(--color-text-helper);
+  margin-top: 4rpx;
 }
 
-/* 操作按钮 */
-.action-buttons {
-  margin-top: var(--spacing-md);
+/* ==================== 操作按钮 ==================== */
+.action-group {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
 }
 
 .btn {
-  width: 100%;
   height: 88rpx;
   border-radius: var(--radius-md);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
+  letter-spacing: 0.04em;
+  transition: all 0.15s var(--ease-out);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-block {
+  width: 100%;
 }
 
 .btn-primary {
   background: var(--color-primary);
-  color: #fff;
+  color: #FFFFFF;
+  box-shadow: 0 4rpx 14rpx rgba(79, 70, 229, 0.25);
 }
 
 .btn-outline {
   background: var(--color-card);
   color: var(--color-text-primary);
-  border: 1rpx solid var(--color-border);
+  border: 2rpx solid var(--color-border);
 }
 
-.btn-warning {
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.btn-warning-outline {
   color: var(--color-warning);
   border-color: var(--color-warning);
 }
 
-.btn-success {
+.btn-success-outline {
   color: var(--color-success);
   border-color: var(--color-success);
 }
 
-.btn-danger {
+.btn-danger-text {
   color: var(--color-expired);
-  border-color: var(--color-expired);
 }
 
-/* 加载 */
+/* ==================== 加载 ==================== */
 .loading-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-2xl);
+}
+
+.loading-spinner {
+  width: 48rpx;
+  height: 48rpx;
+  border: 4rpx solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: var(--spacing-sm);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .loading-text {
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
   font-size: var(--font-size-sm);
 }
 
-/* 底部安全距离 */
 .safe-bottom {
   height: 60rpx;
 }

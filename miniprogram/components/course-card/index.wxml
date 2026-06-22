@@ -1,50 +1,52 @@
-<!-- 课程卡片组件 -->
-<view class="card" wx:if="{{course}}" bindtap="onTap">
+<!--
+  课程卡片组件
+  设计签名：左侧色带标识课程状态
+-->
+<view class="card-accent card-status-{{course.status}}" wx:if="{{course}}" bindtap="onTap">
 
-  <!-- 卡片头部 -->
-  <view class="card-header">
-    <view class="card-name">
-      <text>{{course.name || '未命名课程'}}</text>
+  <!-- 卡片主体 -->
+  <view class="card-main">
+    <!-- 左侧：信息区 -->
+    <view class="card-info">
+      <view class="card-name-row">
+        <text class="card-name">{{course.name || '未命名课程'}}</text>
+        <view class="tag tag-{{course.status || 'active'}}">
+          {{statusLabel}}
+        </view>
+      </view>
+      <view class="card-meta">
+        <text class="meta-item" wx:if="{{subjectLabel}}">{{subjectLabel}}</text>
+        <text class="meta-dot" wx:if="{{subjectLabel && courseTypeLabel}}">·</text>
+        <text class="meta-item" wx:if="{{courseTypeLabel}}">{{courseTypeLabel}}</text>
+      </view>
     </view>
-    <view class="tag {{course.status || 'active'}}">
-      {{statusLabel}}
+
+    <!-- 右侧：环形进度 -->
+    <view class="card-progress-ring">
+      <view class="ring-bg"></view>
+      <view class="ring-fill" style="--progress: {{progressPercent}}"></view>
+      <view class="ring-center">
+        <text class="ring-value">{{course.remainingHours || 0}}</text>
+        <text class="ring-label">剩余</text>
+      </view>
     </view>
   </view>
 
-  <!-- 进度条 -->
-  <view class="progress-section">
-    <view class="progress-bar">
-      <view class="progress-fill" style="width: {{progressPercent}}%"></view>
+  <!-- 底部：课时信息 -->
+  <view class="card-bottom">
+    <view class="hours-bar">
+      <view class="hours-fill" style="width: {{progressPercent}}%"></view>
     </view>
-    <view class="progress-info">
-      <text class="pi-left">已消 {{course.consumedHours || 0}} / {{course.totalHours || 0}} 课时</text>
-      <text class="pi-right">{{progressPercent}}%</text>
-    </view>
-  </view>
-
-  <!-- 底部信息 -->
-  <view class="card-footer">
-    <view class="cf-item" wx:if="{{subjectLabel}}">
-      <text class="cf-label">科目</text>
-      <text class="cf-value">{{subjectLabel}}</text>
-    </view>
-    <view class="cf-item" wx:if="{{courseTypeLabel}}">
-      <text class="cf-label">类型</text>
-      <text class="cf-value">{{courseTypeLabel}}</text>
-    </view>
-    <view class="cf-item">
-      <text class="cf-label">剩余</text>
-      <text class="cf-value cf-highlight {{course.remainingHours <= (course.lowHoursThreshold || 3) ? 'cf-warn' : ''}}">
-        {{course.remainingHours || 0}} 课时
-      </text>
+    <view class="hours-info">
+      <text class="hours-text">已消 {{course.consumedHours || 0}} / {{course.totalHours || 0}} 课时</text>
+      <text class="hours-percent {{course.remainingHours <= (course.lowHoursThreshold || 3) ? 'hours-warn' : ''}}">{{progressPercent}}%</text>
     </view>
   </view>
 
   <!-- 过期提醒 -->
-  <view class="card-warning" wx:if="{{course.status === 'active' && course.expiryDate}}">
-    <text class="cw-text" wx:if="{{isExpiring}}">
-      ⚡ 将于 {{course.expiryDate}} 过期
-    </text>
+  <view class="card-expiry" wx:if="{{course.status === 'active' && isExpiring}}">
+    <view class="expiry-dot"></view>
+    <text class="expiry-text">将于 {{course.expiryDate}} 到期</text>
   </view>
 
 </view>

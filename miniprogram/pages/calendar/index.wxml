@@ -1,16 +1,26 @@
-<!-- 日历看板页 -->
+<!--
+  日历看板页
+  设计语言：「墨蓝 · 纸白」
+-->
 <view class="page-container">
 
   <!-- ==================== 月份切换导航 ==================== -->
   <view class="month-nav">
-    <view class="nav-arrow" bindtap="onPrevMonth">‹</view>
-    <view class="nav-title">{{year}}年 {{month}}月</view>
-    <view class="nav-arrow" bindtap="onNextMonth">›</view>
+    <view class="nav-btn" bindtap="onPrevMonth">
+      <text class="nav-arrow">‹</text>
+    </view>
+    <view class="nav-center">
+      <text class="nav-year">{{year}}</text>
+      <text class="nav-month">{{month}}月</text>
+    </view>
+    <view class="nav-btn" bindtap="onNextMonth">
+      <text class="nav-arrow">›</text>
+    </view>
   </view>
 
   <!-- ==================== 星期标题行 ==================== -->
   <view class="weekday-row">
-    <view class="weekday-col" wx:for="{{['日','一','二','三','四','五','六']}}" wx:key="*this">
+    <view class="weekday-col {{index === 0 || index === 6 ? 'weekend' : ''}}" wx:for="{{['日','一','二','三','四','五','六']}}" wx:key="*this">
       <text class="weekday-text">{{item}}</text>
     </view>
   </view>
@@ -35,94 +45,111 @@
 
   <!-- 加载中 -->
   <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
     <text class="loading-text">加载中...</text>
   </view>
 
-  <!-- ==================== 日期详情弹窗 ==================== -->
+  <!-- ==================== 日期详情底部弹窗 ==================== -->
   <view class="popup-mask" wx:if="{{showDetailPopup}}" bindtap="onCloseDetail">
-    <view class="popup-content" catchtap="">
-      <view class="popup-header">
-        <text class="popup-title">{{selectedDate}}</text>
-        <text class="popup-close" bindtap="onCloseDetail">✕</text>
-      </view>
-      <view class="popup-body">
-        <!-- 汇总信息 -->
-        <view class="lesson-summary" wx:if="{{selectedLessons.length > 0}}">
-          <text class="summary-text">共 {{selectedLessons.length}} 条记录</text>
-        </view>
+    <view class="popup-bottom" catchtap="">
+      <!-- 拖拽条 -->
+      <view class="popup-handle"></view>
 
+      <!-- 弹窗头部 -->
+      <view class="popup-header">
+        <view class="popup-title-area">
+          <text class="popup-date">{{selectedDate}}</text>
+          <text class="popup-summary" wx:if="{{selectedLessons.length > 0}}">{{selectedLessons.length}} 条记录</text>
+        </view>
+        <view class="popup-close-btn" bindtap="onCloseDetail">
+          <text class="close-icon">✕</text>
+        </view>
+      </view>
+
+      <!-- 弹窗内容 -->
+      <view class="popup-body">
         <block wx:if="{{selectedLessons.length > 0}}">
           <!-- 已完成的消课记录 -->
           <view
-            class="lesson-card"
+            class="lesson-card lesson-card-{{item.status}}"
             wx:for="{{selectedLessons}}"
             wx:key="lessonRecordId"
             wx:if="{{item.lessonRecordId}}"
             data-course-id="{{item.courseId}}"
             bindtap="onLessonTap"
           >
-            <view class="lc-header">
-              <view class="lc-status-badge {{item.status}}">
-                {{item.deductionType === 'auto' ? '自动消课' : '手动消课'}}
+            <view class="lc-left-accent lc-accent-{{item.status}}"></view>
+            <view class="lc-content">
+              <view class="lc-top">
+                <text class="lc-course-name">{{item.courseName}}</text>
+                <text class="lc-hours">-{{item.deductionHours}}</text>
               </view>
-              <text class="lc-hours">-{{item.deductionHours}}课时</text>
-            </view>
-            <view class="lc-body">
-              <text class="lc-course-name">{{item.courseName}}</text>
-              <text class="lc-time">{{item.time}}</text>
-            </view>
-            <!-- 手动消课：操作按钮 -->
-            <view class="lc-actions" wx:if="{{item.deductionType === 'manual'}}">
-              <text
-                class="lc-btn lc-btn-edit"
-                data-record-id="{{item.lessonRecordId}}"
-                data-course-id="{{item.courseId}}"
-                data-hours="{{item.deductionHours}}"
-                data-notes="{{item.notes}}"
-                catchtap="onEditLesson"
-              >编辑</text>
-              <text
-                class="lc-btn lc-btn-delete"
-                data-record-id="{{item.lessonRecordId}}"
-                catchtap="onDeleteLesson"
-              >删除</text>
+              <view class="lc-bottom">
+                <view class="lc-badge lc-badge-{{item.status}}">
+                  {{item.deductionType === 'auto' ? '自动消课' : '手动消课'}}
+                </view>
+                <text class="lc-time">{{item.time}}</text>
+              </view>
+              <!-- 手动消课：操作按钮 -->
+              <view class="lc-actions" wx:if="{{item.deductionType === 'manual'}}">
+                <view
+                  class="lc-action-btn lc-btn-edit"
+                  data-record-id="{{item.lessonRecordId}}"
+                  data-course-id="{{item.courseId}}"
+                  data-hours="{{item.deductionHours}}"
+                  data-notes="{{item.notes}}"
+                  catchtap="onEditLesson"
+                >编辑</view>
+                <view
+                  class="lc-action-btn lc-btn-delete"
+                  data-record-id="{{item.lessonRecordId}}"
+                  catchtap="onDeleteLesson"
+                >删除</view>
+              </view>
             </view>
           </view>
 
           <!-- 待上课/已错过 -->
           <view
-            class="lesson-card"
+            class="lesson-card lesson-card-{{item.status}}"
             wx:for="{{selectedLessons}}"
             wx:key="courseId"
             wx:if="{{!item.lessonRecordId}}"
           >
-            <view class="lc-header">
-              <view class="lc-status-badge {{item.status}}">
-                {{item.status === 'pending' ? '待上课' : '已错过'}}
+            <view class="lc-left-accent lc-accent-{{item.status}}"></view>
+            <view class="lc-content">
+              <view class="lc-top">
+                <text class="lc-course-name">{{item.courseName}}</text>
+                <text class="lc-time-tag">{{item.time}}</text>
               </view>
-              <text class="lc-time-tag">{{item.time}}</text>
-            </view>
-            <view class="lc-body">
-              <text class="lc-course-name">{{item.courseName}}</text>
-            </view>
-            <view class="lc-actions" wx:if="{{item.status === 'pending'}}">
-              <button
-                class="btn-deduct-small"
-                data-course-id="{{item.courseId}}"
-                data-date="{{selectedDate}}"
-                catchtap="onQuickDeduct"
-              >消课</button>
+              <view class="lc-bottom">
+                <view class="lc-badge lc-badge-{{item.status}}">
+                  {{item.status === 'pending' ? '待上课' : '已错过'}}
+                </view>
+              </view>
+              <view class="lc-actions" wx:if="{{item.status === 'pending'}}">
+                <view
+                  class="lc-action-btn lc-btn-deduct"
+                  data-course-id="{{item.courseId}}"
+                  data-date="{{selectedDate}}"
+                  catchtap="onQuickDeduct"
+                >立即消课</view>
+              </view>
             </view>
           </view>
         </block>
+
+        <!-- 空状态 -->
         <view class="empty-lesson" wx:else>
-          <text>当日无课程安排</text>
+          <text class="empty-lesson-icon">📋</text>
+          <text class="empty-lesson-text">当日无课程安排</text>
         </view>
       </view>
+
       <!-- 弹窗底部操作栏 -->
       <view class="popup-footer">
         <button class="btn-add-lesson" bindtap="onManualAdd">
-          ✏️ 手动记录课时
+          手动记录课时
         </button>
       </view>
     </view>

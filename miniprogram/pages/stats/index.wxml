@@ -1,4 +1,7 @@
-<!-- 数据统计页 -->
+<!--
+  数据统计页
+  设计语言：「墨蓝 · 纸白」
+-->
 <view class="page-container" wx:if="{{!loading && summary}}">
 
   <!-- ==================== Tab 切换 ==================== -->
@@ -18,50 +21,55 @@
       data-tab="warnings"
       bindtap="onSwitchTab"
     >预警
-      <text class="tab-badge" wx:if="{{expiryWarnings.length + lowHoursWarnings.length > 0}}">
+      <view class="tab-badge" wx:if="{{expiryWarnings.length + lowHoursWarnings.length > 0}}">
         {{expiryWarnings.length + lowHoursWarnings.length}}
-      </text>
+      </view>
     </view>
   </view>
 
   <!-- ==================== 总览 ==================== -->
   <view class="tab-content" wx:if="{{activeTab === 'overview'}}">
 
-    <!-- 核心指标 -->
-    <view class="metric-cards">
+    <!-- 核心指标网格 -->
+    <view class="metric-grid">
       <view class="metric-card">
-        <text class="metric-value">{{summary.totalCourses || 0}}</text>
+        <text class="metric-number">{{summary.totalCourses || 0}}</text>
         <text class="metric-label">总课程</text>
       </view>
-      <view class="metric-card">
-        <text class="metric-value primary">{{summary.activeCourses || 0}}</text>
+      <view class="metric-card metric-card-primary">
+        <text class="metric-number">{{summary.activeCourses || 0}}</text>
         <text class="metric-label">活跃中</text>
       </view>
-      <view class="metric-card">
-        <text class="metric-value warning">{{summary.totalRemainingHours || 0}}</text>
+      <view class="metric-card metric-card-warning">
+        <text class="metric-number">{{summary.totalRemainingHours || 0}}</text>
         <text class="metric-label">剩余课时</text>
       </view>
-      <view class="metric-card">
-        <text class="metric-value success">{{summary.totalConsumedHours || 0}}</text>
+      <view class="metric-card metric-card-success">
+        <text class="metric-number">{{summary.totalConsumedHours || 0}}</text>
         <text class="metric-label">已消耗</text>
       </view>
     </view>
 
-    <!-- 月度消课 -->
-    <view class="card mt-md" wx:if="{{summary.monthlyDeductionHours > 0}}">
-      <view class="card-title">本月消课</view>
-      <view class="big-number">{{summary.monthlyDeductionHours}} 课时</view>
+    <!-- 本月消课 -->
+    <view class="highlight-card" wx:if="{{summary.monthlyDeductionHours > 0}}">
+      <view class="highlight-left">
+        <text class="highlight-label">本月消课</text>
+        <text class="highlight-value">{{summary.monthlyDeductionHours}} 课时</text>
+      </view>
+      <view class="highlight-ring">
+        <text class="highlight-ring-icon">📊</text>
+      </view>
     </view>
 
     <!-- 趋势图 -->
-    <view class="card mt-md" wx:if="{{lineOption}}">
-      <view class="card-title">近30天消课趋势</view>
+    <view class="chart-card" wx:if="{{lineOption}}">
+      <text class="chart-title">近30天消课趋势</text>
       <stats-chart option="{{lineOption}}" height="400" />
     </view>
 
     <!-- 分类饼图 -->
-    <view class="card mt-md" wx:if="{{pieOption}}">
-      <view class="card-title">课程类型分布</view>
+    <view class="chart-card" wx:if="{{pieOption}}">
+      <text class="chart-title">课程类型分布</text>
       <stats-chart option="{{pieOption}}" height="500" />
     </view>
   </view>
@@ -70,8 +78,8 @@
   <view class="tab-content" wx:if="{{activeTab === 'breakdown'}}">
 
     <!-- 课程分布 -->
-    <view class="card" wx:if="{{courseBreakdown.length > 0}}">
-      <view class="card-title">各课程消耗详情</view>
+    <view class="section-card" wx:if="{{courseBreakdown.length > 0}}">
+      <text class="section-title">各课程消耗详情</text>
       <view
         class="breakdown-item"
         wx:for="{{courseBreakdown}}"
@@ -81,12 +89,12 @@
           <text class="bi-name">{{item.courseName}}</text>
           <text class="bi-percent">{{item.progressPercent || 0}}%</text>
         </view>
-        <view class="progress-bar">
+        <view class="progress-track">
           <view class="progress-fill" style="width: {{item.progressPercent || 0}}%"></view>
         </view>
         <view class="bi-footer">
-          <text>已消 {{item.consumedHours || item.totalConsumed || 0}}</text>
-          <text>剩余 {{item.remainingHours || item.totalRemaining || 0}}</text>
+          <text class="bi-stat">已消 {{item.consumedHours || item.totalConsumed || 0}}</text>
+          <text class="bi-stat">剩余 {{item.remainingHours || item.totalRemaining || 0}}</text>
         </view>
       </view>
     </view>
@@ -104,50 +112,46 @@
   <view class="tab-content" wx:if="{{activeTab === 'warnings'}}">
 
     <!-- 过期预警 -->
-    <view class="card" wx:if="{{expiryWarnings.length > 0}}">
-      <view class="card-title">
-        <text class="warn-title-icon">⏰</text>
-        <text>即将过期（30天内）</text>
+    <view class="section-card" wx:if="{{expiryWarnings.length > 0}}">
+      <view class="section-header">
+        <view class="section-dot section-dot-warning"></view>
+        <text class="section-title">即将过期（30天内）</text>
       </view>
       <view
-        class="warn-item warn-expiry"
+        class="warn-item"
         wx:for="{{expiryWarnings}}"
         wx:key="courseId"
         data-course-id="{{item.courseId}}"
         bindtap="onWarningTap"
       >
-        <view class="wi-icon warn-expiry-icon">
-          <text>⚠️</text>
+        <view class="warn-accent warn-accent-warning"></view>
+        <view class="warn-content">
+          <text class="warn-name">{{item.courseName}}</text>
+          <text class="warn-detail">过期 {{item.expiryDate}} · 剩余 {{item.remainingHours || 0}} 课时</text>
         </view>
-        <view class="wi-left">
-          <text class="wi-name">{{item.courseName}}</text>
-          <text class="wi-sub">过期日期: {{item.expiryDate}} 剩余 {{item.remainingHours || 0}} 课时</text>
-        </view>
-        <text class="wi-arrow">›</text>
+        <text class="warn-arrow">›</text>
       </view>
     </view>
 
     <!-- 低课时预警 -->
-    <view class="card mt-md" wx:if="{{lowHoursWarnings.length > 0}}">
-      <view class="card-title">
-        <text class="warn-title-icon">💡</text>
-        <text>低课时预警</text>
+    <view class="section-card" wx:if="{{lowHoursWarnings.length > 0}}">
+      <view class="section-header">
+        <view class="section-dot section-dot-danger"></view>
+        <text class="section-title">低课时预警</text>
       </view>
       <view
-        class="warn-item warn-low"
+        class="warn-item"
         wx:for="{{lowHoursWarnings}}"
         wx:key="courseId"
         data-course-id="{{item.courseId}}"
         bindtap="onWarningTap"
       >
-        <view class="wi-icon warn-low-icon">
-          <text>🔔</text>
+        <view class="warn-accent warn-accent-danger"></view>
+        <view class="warn-content">
+          <text class="warn-name">{{item.courseName}}</text>
+          <text class="warn-detail">仅剩 {{item.remainingHours || 0}} 课时</text>
         </view>
-        <view class="wi-left">
-          <text class="wi-name">{{item.courseName}}</text>
-          <text class="wi-sub">仅剩 {{item.remainingHours || 0}} 课时</text>
-        </view>
-        <text class="wi-arrow">›</text>
+        <text class="warn-arrow">›</text>
       </view>
     </view>
 
@@ -165,6 +169,7 @@
 
 <!-- 加载中 -->
 <view class="loading-container" wx:if="{{loading}}">
+  <view class="loading-spinner"></view>
   <text class="loading-text">加载中...</text>
 </view>
 

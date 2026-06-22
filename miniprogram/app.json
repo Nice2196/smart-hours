@@ -11,33 +11,33 @@
     "pages/audit-log/index"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarBackgroundColor": "#FFFFFF",
     "navigationBarTitleText": "智慧课时管理",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f5f5f5",
+    "backgroundColor": "#FAF8F5",
     "backgroundTextStyle": "light"
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#1890FF",
-    "backgroundColor": "#ffffff",
+    "color": "#94A3B8",
+    "selectedColor": "#4F46E5",
+    "backgroundColor": "#FFFFFF",
     "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "📚 首页"
+        "text": "首页"
       },
       {
         "pagePath": "pages/calendar/index",
-        "text": "📅 日历"
+        "text": "日历"
       },
       {
         "pagePath": "pages/stats/index",
-        "text": "📊 统计"
+        "text": "统计"
       },
       {
         "pagePath": "pages/settings/index",
-        "text": "⚙️ 设置"
+        "text": "设置"
       }
     ]
   },

@@ -1,83 +1,106 @@
 <!--
   首页 - 课程总览
-  展示活跃课程卡片、预警横幅、快速操作入口
+  设计语言：「墨蓝 · 纸白」
+  结构：渐变统计头 → 预警区 → 筛选栏 → 课程列表 → FAB
 -->
 <view class="page-container">
 
-  <!-- ==================== 统计概览卡片 ==================== -->
-  <view class="stats-row" wx:if="{{!isEmpty}}">
-    <view class="stat-item">
-      <text class="stat-value">{{stats.activeCourses || 0}}</text>
-      <text class="stat-label">活跃课程</text>
-    </view>
-    <view class="stat-divider"></view>
-    <view class="stat-item">
-      <text class="stat-value">{{stats.totalRemainingHours || 0}}</text>
-      <text class="stat-label">剩余课时</text>
-    </view>
-    <view class="stat-divider"></view>
-    <view class="stat-item">
-      <text class="stat-value">{{stats.monthlyDeductionHours || 0}}</text>
-      <text class="stat-label">本月消课</text>
+  <!-- ==================== 渐变统计头 ==================== -->
+  <view class="hero-stats" wx:if="{{!isEmpty && !loading}}">
+    <view class="hero-bg"></view>
+    <view class="hero-content">
+      <view class="hero-greeting">
+        <text class="hero-title">课时总览</text>
+        <text class="hero-subtitle">管理你的每一节课</text>
+      </view>
+      <view class="hero-metrics">
+        <view class="metric-item">
+          <text class="metric-value">{{stats.activeCourses || 0}}</text>
+          <text class="metric-label">进行中</text>
+        </view>
+        <view class="metric-divider"></view>
+        <view class="metric-item">
+          <text class="metric-value">{{stats.totalRemainingHours || 0}}</text>
+          <text class="metric-label">剩余课时</text>
+        </view>
+        <view class="metric-divider"></view>
+        <view class="metric-item">
+          <text class="metric-value">{{stats.monthlyDeductionHours || 0}}</text>
+          <text class="metric-label">本月消课</text>
+        </view>
+      </view>
     </view>
   </view>
 
-  <!-- ==================== 预警横幅 ==================== -->
-  <!-- 低课时预警 -->
-  <view class="warning-banner warning-low" wx:if="{{lowHoursWarnings.length > 0}}">
-    <text class="warning-icon">⚠️</text>
-    <text class="warning-text">
-      {{lowHoursWarnings.length}}门课程课时不足：
-      <block wx:for="{{lowHoursWarnings}}" wx:key="courseId">
-        {{item.courseName}}(剩{{item.remainingHours}}节)
-        <block wx:if="{{index < lowHoursWarnings.length - 1}}">、</block>
-      </block>
-    </text>
+  <!-- ==================== 预警区 ==================== -->
+  <view class="warnings-section" wx:if="{{lowHoursWarnings.length > 0 || expiryWarnings.length > 0}}">
+    <!-- 低课时预警 -->
+    <view class="warning-card warning-card-expired" wx:if="{{lowHoursWarnings.length > 0}}">
+      <view class="warning-header">
+        <view class="warning-dot warning-dot-expired"></view>
+        <text class="warning-title">课时不足</text>
+        <text class="warning-count">{{lowHoursWarnings.length}}门</text>
+      </view>
+      <view class="warning-body">
+        <text class="warning-detail" wx:for="{{lowHoursWarnings}}" wx:key="courseId">
+          {{item.courseName}} 剩余 {{item.remainingHours}} 节
+          <text wx:if="{{index < lowHoursWarnings.length - 1}}" class="warning-sep"> · </text>
+        </text>
+      </view>
+    </view>
+
+    <!-- 即将过期预警 -->
+    <view class="warning-card warning-card-warning" wx:if="{{expiryWarnings.length > 0}}">
+      <view class="warning-header">
+        <view class="warning-dot warning-dot-warning"></view>
+        <text class="warning-title">即将过期</text>
+        <text class="warning-count">{{expiryWarnings.length}}门</text>
+      </view>
+      <view class="warning-body">
+        <text class="warning-detail" wx:for="{{expiryWarnings}}" wx:key="courseId">
+          {{item.courseName}} {{item.daysUntilExpiry}}天后到期
+          <text wx:if="{{index < expiryWarnings.length - 1}}" class="warning-sep"> · </text>
+        </text>
+      </view>
+    </view>
   </view>
 
-  <!-- 即将过期预警 -->
-  <view class="warning-banner warning-expiry" wx:if="{{expiryWarnings.length > 0}}">
-    <text class="warning-icon">⏰</text>
-    <text class="warning-text">
-      {{expiryWarnings.length}}门课程即将过期：
-      <block wx:for="{{expiryWarnings}}" wx:key="courseId">
-        {{item.courseName}}({{item.daysUntilExpiry}}天后)
-        <block wx:if="{{index < expiryWarnings.length - 1}}">、</block>
-      </block>
-    </text>
-  </view>
-
-  <!-- ==================== 课程列表 ==================== -->
+  <!-- ==================== 课程列表区 ==================== -->
   <block wx:if="{{!loading}}">
 
-    <!-- 状态筛选 Tab -->
-    <view class="filter-tabs" wx:if="{{!isEmpty}}">
-      <view
-        class="filter-tab {{activeFilter === '' ? 'active' : ''}}"
-        data-filter=""
-        bindtap="onFilterChange"
-      >全部</view>
-      <view
-        class="filter-tab {{activeFilter === 'active' ? 'active' : ''}}"
-        data-filter="active"
-        bindtap="onFilterChange"
-      >进行中</view>
-      <view
-        class="filter-tab {{activeFilter === 'paused' ? 'active' : ''}}"
-        data-filter="paused"
-        bindtap="onFilterChange"
-      >已暂停</view>
-      <view
-        class="filter-tab {{activeFilter === 'completed' ? 'active' : ''}}"
-        data-filter="completed"
-        bindtap="onFilterChange"
-      >已完成</view>
-      <view
-        class="filter-tab {{activeFilter === 'expired' ? 'active' : ''}}"
-        data-filter="expired"
-        bindtap="onFilterChange"
-      >已过期</view>
+    <!-- 筛选栏 -->
+    <view class="filter-bar" wx:if="{{!isEmpty}}">
+      <scroll-view scroll-x class="filter-scroll">
+        <view class="filter-items">
+          <view
+            class="filter-item {{activeFilter === '' ? 'active' : ''}}"
+            data-filter=""
+            bindtap="onFilterChange"
+          >全部</view>
+          <view
+            class="filter-item {{activeFilter === 'active' ? 'active' : ''}}"
+            data-filter="active"
+            bindtap="onFilterChange"
+          >进行中</view>
+          <view
+            class="filter-item {{activeFilter === 'paused' ? 'active' : ''}}"
+            data-filter="paused"
+            bindtap="onFilterChange"
+          >已暂停</view>
+          <view
+            class="filter-item {{activeFilter === 'completed' ? 'active' : ''}}"
+            data-filter="completed"
+            bindtap="onFilterChange"
+          >已完成</view>
+          <view
+            class="filter-item {{activeFilter === 'expired' ? 'active' : ''}}"
+            data-filter="expired"
+            bindtap="onFilterChange"
+          >已过期</view>
+        </view>
+      </scroll-view>
     </view>
+
     <!-- 空状态 -->
     <empty-state
       wx:if="{{filteredCourses.length === 0}}"
@@ -96,16 +119,17 @@
     </view>
   </block>
 
-  <!-- 加载中 -->
-  <view class="loading-container" wx:if="{{loading}}">
-    <text class="loading-text">加载中...</text>
+  <!-- 加载骨架屏 -->
+  <view class="skeleton-container" wx:if="{{loading}}">
+    <view class="skeleton-hero"></view>
+    <view class="skeleton-card" wx:for="{{[1,2,3]}}" wx:key="*this"></view>
   </view>
 
   <!-- ==================== 底部新增按钮 ==================== -->
   <view class="fab-container">
-    <button class="fab-btn btn-primary" bindtap="onAddCourse">
-      <text class="fab-icon">+</text>
-      <text>新增课程</text>
+    <button class="fab-btn" bindtap="onAddCourse">
+      <text class="fab-icon">＋</text>
+      <text class="fab-text">新增课程</text>
     </button>
   </view>
 

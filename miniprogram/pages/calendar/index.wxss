@@ -1,12 +1,14 @@
 /**
  * 日历看板页样式
+ * 设计语言：「墨蓝 · 纸白」
  */
+
 .page-container {
   min-height: 100vh;
-  background: var(--color-card);
+  background: var(--color-bg);
 }
 
-/* 月份导航 */
+/* ==================== 月份导航 ==================== */
 .month-nav {
   display: flex;
   flex-direction: row;
@@ -14,36 +16,55 @@
   justify-content: space-between;
   padding: var(--spacing-md) var(--spacing-lg);
   background: var(--color-card);
+  border-bottom: 1rpx solid var(--color-border);
 }
 
-.nav-arrow {
+.nav-btn {
   width: 72rpx;
   height: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40rpx;
-  color: var(--color-primary);
-  font-weight: 300;
   border-radius: var(--radius-round);
+  transition: background 0.15s;
 }
 
-.nav-arrow:active {
+.nav-btn:active {
   background: var(--color-primary-light);
 }
 
-.nav-title {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--color-text-primary);
+.nav-arrow {
+  font-size: 44rpx;
+  color: var(--color-primary);
+  font-weight: 300;
+  line-height: 1;
 }
 
-/* 星期标题 */
+.nav-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-year {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-helper);
+  letter-spacing: 0.1em;
+}
+
+.nav-month {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+/* ==================== 星期标题 ==================== */
 .weekday-row {
   display: flex;
   flex-direction: row;
   padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--color-bg);
+  background: var(--color-card);
   border-bottom: 1rpx solid var(--color-border);
 }
 
@@ -54,45 +75,76 @@
 
 .weekday-text {
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
+  font-weight: 500;
+  letter-spacing: 0.05em;
 }
 
-.weekday-col:first-child .weekday-text,
-.weekday-col:last-child .weekday-text {
+.weekday-col.weekend .weekday-text {
   color: var(--color-expired);
+  opacity: 0.6;
 }
 
-/* 加载 */
+/* ==================== 加载 ==================== */
 .loading-container {
-  padding: var(--spacing-xl);
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+}
+
+.loading-spinner {
+  width: 48rpx;
+  height: 48rpx;
+  border: 4rpx solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: var(--spacing-sm);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .loading-text {
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
   font-size: var(--font-size-sm);
 }
 
-/* ==================== 弹窗 ==================== */
+/* ==================== 底部弹窗 ==================== */
 .popup-mask {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 100;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  background: rgba(15, 23, 42, 0.5);
+  z-index: 1000;
+  animation: fadeIn 0.2s var(--ease-out);
 }
 
-.popup-content {
+.popup-bottom {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: var(--color-card);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  width: 100%;
-  max-height: 60vh;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  z-index: 1001;
+  animation: slideUp 0.3s var(--ease-out);
+  max-height: 80vh;
   overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.popup-handle {
+  width: 64rpx;
+  height: 8rpx;
+  background: var(--color-border);
+  border-radius: 4rpx;
+  margin: 16rpx auto 0;
 }
 
 .popup-header {
@@ -104,108 +156,144 @@
   border-bottom: 1rpx solid var(--color-border);
 }
 
-.popup-title {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
+.popup-title-area {
+  display: flex;
+  flex-direction: column;
 }
 
-.popup-close {
-  width: 60rpx;
-  height: 60rpx;
+.popup-date {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.popup-summary {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-helper);
+  margin-top: 4rpx;
+}
+
+.popup-close-btn {
+  width: 56rpx;
+  height: 56rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-lg);
+  border-radius: var(--radius-round);
+  background: var(--color-bg);
+}
+
+.close-icon {
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 
 .popup-body {
-  padding: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm);
 }
 
-/* 汇总信息 */
-.lesson-summary {
-  padding-bottom: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
-  border-bottom: 1rpx solid var(--color-border);
-}
-
-.summary-text {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-}
-
-/* 课程卡片（新设计） */
+/* ==================== 课程卡片 ==================== */
 .lesson-card {
+  display: flex;
+  flex-direction: row;
   background: var(--color-bg);
   border-radius: var(--radius-md);
-  padding: var(--spacing-md);
   margin-bottom: var(--spacing-sm);
+  overflow: hidden;
+  transition: transform 0.15s var(--ease-out);
 }
 
 .lesson-card:active {
-  opacity: 0.8;
+  transform: scale(0.985);
 }
 
-.lc-header {
+.lc-left-accent {
+  width: 6rpx;
+  flex-shrink: 0;
+}
+
+.lc-accent-completed {
+  background: var(--color-success);
+}
+
+.lc-accent-pending {
+  background: var(--color-pending);
+}
+
+.lc-accent-expired {
+  background: var(--color-expired);
+}
+
+.lc-content {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  min-width: 0;
+}
+
+.lc-top {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--spacing-xs);
-}
-
-.lc-status-badge {
-  font-size: var(--font-size-xs);
-  padding: 2rpx 16rpx;
-  border-radius: var(--radius-round);
-}
-
-.lc-status-badge.completed {
-  color: var(--color-success);
-  background: rgba(82, 196, 26, 0.1);
-}
-
-.lc-status-badge.pending {
-  color: var(--color-primary);
-  background: rgba(24, 144, 255, 0.1);
-}
-
-.lc-status-badge.expired {
-  color: var(--color-expired);
-  background: rgba(255, 77, 79, 0.1);
-}
-
-.lc-hours {
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  color: var(--color-expired);
-}
-
-.lc-time-tag {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-}
-
-.lc-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4rpx;
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 8rpx;
 }
 
 .lc-course-name {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
+  margin-right: var(--spacing-sm);
+}
+
+.lc-hours {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-expired);
+  flex-shrink: 0;
+}
+
+.lc-time-tag {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-helper);
+  flex-shrink: 0;
+}
+
+.lc-bottom {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.lc-badge {
+  font-size: 22rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 4rpx;
+  font-weight: 500;
+}
+
+.lc-badge-completed {
+  color: var(--color-success);
+  background: var(--color-success-light);
+}
+
+.lc-badge-pending {
+  color: var(--color-pending);
+  background: var(--color-pending-light);
+}
+
+.lc-badge-expired {
+  color: var(--color-expired);
+  background: var(--color-expired-light);
 }
 
 .lc-time {
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--color-text-helper);
 }
 
 .lc-actions {
@@ -213,173 +301,79 @@
   flex-direction: row;
   align-items: center;
   gap: var(--spacing-sm);
-  margin-top: var(--spacing-xs);
-  padding-top: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
   border-top: 1rpx solid var(--color-border);
 }
 
-.lc-btn {
+.lc-action-btn {
   font-size: var(--font-size-xs);
-  padding: 6rpx 20rpx;
+  padding: 8rpx 20rpx;
   border-radius: var(--radius-sm);
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+
+.lc-action-btn:active {
+  opacity: 0.7;
 }
 
 .lc-btn-edit {
   color: var(--color-primary);
-  background: rgba(24, 144, 255, 0.1);
-}
-
-.lc-btn-edit:active {
-  opacity: 0.7;
+  background: var(--color-primary-light);
 }
 
 .lc-btn-delete {
   color: var(--color-expired);
-  background: rgba(255, 77, 79, 0.1);
+  background: var(--color-expired-light);
 }
 
-.lc-btn-delete:active {
-  opacity: 0.7;
+.lc-btn-deduct {
+  color: #FFFFFF;
+  background: var(--color-primary);
+  box-shadow: 0 2rpx 8rpx rgba(79, 70, 229, 0.2);
 }
 
-.lesson-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: var(--spacing-md) 0;
-  border-bottom: 1rpx solid var(--color-border);
-}
-
-.lesson-item:active {
-  background: var(--color-bg);
-  border-radius: var(--radius-sm);
-}
-
-.lesson-status-dot {
-  width: 16rpx;
-  height: 16rpx;
-  border-radius: var(--radius-round);
-  margin-right: var(--spacing-md);
-  flex-shrink: 0;
-}
-
-.lesson-status-dot.completed {
-  background: var(--color-success);
-}
-
-.lesson-status-dot.pending {
-  background: var(--color-pending);
-}
-
-.lesson-status-dot.expired {
-  background: var(--color-expired);
-}
-
-.lesson-info {
-  flex: 1;
+/* ==================== 空状态 ==================== */
+.empty-lesson {
   display: flex;
   flex-direction: column;
-}
-
-.lesson-name {
-  font-size: var(--font-size-md);
-  color: var(--color-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 360rpx;
-}
-
-.lesson-time {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  margin-top: 4rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.lesson-arrow {
-  font-size: 32rpx;
-  color: var(--color-text-secondary);
-  margin-left: var(--spacing-sm);
-}
-
-.lesson-btns {
-  display: flex;
-  flex-direction: row;
   align-items: center;
-  margin-left: var(--spacing-sm);
-  flex-shrink: 0;
-}
-
-.lesson-btn {
-  font-size: var(--font-size-xs);
-  padding: 6rpx 16rpx;
-  border-radius: var(--radius-sm);
-  margin-left: 8rpx;
-}
-
-.lesson-btn-edit {
-  color: var(--color-primary);
-  background: rgba(24, 144, 255, 0.1);
-}
-
-.lesson-btn-edit:active {
-  opacity: 0.7;
-}
-
-.lesson-btn-delete {
-  color: var(--color-expired);
-  background: rgba(255, 77, 79, 0.1);
-}
-
-.lesson-btn-delete:active {
-  opacity: 0.7;
-}
-
-.lesson-action {
-  margin-left: var(--spacing-sm);
-  flex-shrink: 0;
-}
-
-.btn-deduct-small {
-  font-size: var(--font-size-xs);
-  padding: 8rpx 24rpx;
-  background: var(--color-primary);
-  color: #fff;
-  border-radius: var(--radius-sm);
-  border: none;
-  line-height: 1.5;
-}
-
-.btn-deduct-small:active {
-  opacity: 0.8;
-}
-
-.empty-lesson {
-  text-align: center;
   padding: var(--spacing-xl);
-  color: var(--color-text-secondary);
+}
+
+.empty-lesson-icon {
+  font-size: 64rpx;
+  margin-bottom: var(--spacing-sm);
+  opacity: 0.5;
+}
+
+.empty-lesson-text {
+  color: var(--color-text-helper);
   font-size: var(--font-size-sm);
 }
 
-/* 弹窗底部操作栏 */
+/* ==================== 弹窗底部 ==================== */
 .popup-footer {
-  padding: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
   border-top: 1rpx solid var(--color-border);
 }
 
 .btn-add-lesson {
   width: 100%;
+  height: 88rpx;
   background: var(--color-primary);
-  color: #fff;
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-md);
-  padding: var(--spacing-sm) 0;
+  color: #FFFFFF;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: 600;
   border: none;
+  letter-spacing: 0.04em;
+  box-shadow: 0 4rpx 14rpx rgba(79, 70, 229, 0.25);
 }
 
 .btn-add-lesson:active {
-  opacity: 0.8;
+  opacity: 0.9;
+  transform: scale(0.98);
 }
