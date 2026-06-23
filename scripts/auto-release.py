@@ -381,18 +381,26 @@ def upload_cloud_functions():
             continue
 
         log(f"上传云函数: {func_name}...")
+        func_path = os.path.join(CLOUDFUNCTIONS_DIR, func_name)
         cmd = [
             "npx",
             "miniprogram-ci",
-            "cloudfn",
+            "cloud",
+            "functions",
+            "upload",
             "--pp",
             PROJECT_DIR,
             "--appid",
             APPID,
             "--pkp",
             KEY_PATH,
-            "--name",
+            "-e",
+            "cloud1-d7gjypgxued9a2b27",
+            "-n",
             func_name,
+            "-p",
+            func_path,
+            "--rnpm",
         ]
 
         try:
