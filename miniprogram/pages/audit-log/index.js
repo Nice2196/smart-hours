@@ -37,6 +37,12 @@ const FIELD_LABELS = {
   courseType: '课程类型',
   subject: '科目',
   totalHours: '总课时',
+  remainingHours: '剩余课时',
+  deductionUnit: '每次扣除',
+  lowHoursThreshold: '低课时阈值',
+  startDate: '开始日期',
+  expiryDate: '过期日期',
+  hours: '课时数',
   teacher: '教师',
   student: '学生',
   notes: '备注'
@@ -241,6 +247,20 @@ Page({
   },
 
   /**
+   * 日期格式化（纯日期，不含时间）
+   * ISO日期字符串或Date对象 → YYYY-MM-DD
+   */
+  _formatDate(dateVal) {
+    if (!dateVal) return ''
+    const d = new Date(dateVal)
+    if (isNaN(d.getTime())) return String(dateVal)
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  },
+
+  /**
    * 根据 actionType + detail 生成可读的操作详情
    * 返回字符串，如 "消课 1 课时，剩余 9 → 8"
    */
@@ -275,7 +295,8 @@ Page({
       const parts = []
       if (s.dayOfWeek != null) parts.push(WEEKDAY_LABELS[s.dayOfWeek] || '')
       if (s.time) parts.push(s.time)
-      if (s.effectiveFrom) parts.push(`自 ${s.effectiveFrom}`)
+      if (s.effectiveFrom) parts.push(`自 ${this._formatDate(s.effectiveFrom)}`)
+      if (s.effectiveTo) parts.push(`至 ${this._formatDate(s.effectiveTo)}`)
       return parts.length ? `每周 ${parts.join(' ')}` : ''
     }
     if (at === 'schedule_update') {
@@ -354,7 +375,18 @@ Page({
       const label = FIELD_LABELS[k] || k
       const c = changes[k]
       if (c && typeof c === 'object' && 'from' in c && 'to' in c) {
-        return `${label}: ${c.from} → ${c.to}`
+        let from = c.from
+        let to = c.to
+        // Date 类型值格式化（ISO 日期字符串检测）
+        if (typeof from === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(from)) {
+          from = this._formatDate(from)
+          to = this._formatDate(to)
+        }
+        // 数字字段追加"课时"后缀
+        if (['totalHours', 'remainingHours', 'deductionUnit', 'hours'].includes(k)) {
+          return `${label}: ${from}课时 → ${to}课时`
+        }
+        return `${label}: ${from} → ${to}`
       }
       return `${label} 已更新`
     })
@@ -380,6 +412,11 @@ Page({
         if (k === 'dayOfWeek') {
           from = WEEKDAY_LABELS[from] || from
           to = WEEKDAY_LABELS[to] || to
+        }
+        // Date 类型值格式化（ISO 日期字符串检测）
+        if (typeof from === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(from)) {
+          from = this._formatDate(from)
+          to = this._formatDate(to)
         }
         return `${label}: ${from} → ${to}`
       }

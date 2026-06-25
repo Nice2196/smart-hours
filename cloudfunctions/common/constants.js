@@ -166,13 +166,13 @@ const BUSINESS = Object.freeze({
   DEFAULT_LOW_HOURS_THRESHOLD: 3.0,
 
   /** 即将过期预警天数（expiryDate 在N天内时提醒） */
-  EXPIRY_WARNING_DAYS: 30,
+  EXPIRY_WARNING_DAYS: 90,
 
   /** 幂等锁 TTL 天数（7天后自动清理） */
   LOCK_TTL_DAYS: 7,
 
   /** 自动消课单次最大处理排课数（防止超时） */
-  MAX_AUTO_DEDUCT_PER_RUN: 20,
+  MAX_AUTO_DEDUCT_PER_RUN: 10,
 
   /** 分页默认每页条数 */
   DEFAULT_PAGE_SIZE: 20,

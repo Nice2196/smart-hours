@@ -25,7 +25,7 @@
  *
  * ⚠️ 处理上限：
  *   为防止云函数超时（默认 3 秒，可配置为 60 秒），
- *   单次最多处理 MAX_AUTO_DEDUCT_PER_RUN = 20 条排课。
+ *   单次最多处理 MAX_AUTO_DEDUCT_PER_RUN = 10 条排课。
  *   超出部分由下一次定时调度继续处理。
  *
  * 定时触发器配置 (config.json):
@@ -65,6 +65,31 @@ cloud.init({
 const db = getDB()
 
 /**
+ * 带重试的异步函数执行器
+ * 自动重试网络超时/连接重置等瞬时错误
+ *
+ * @param {Function} fn - 要执行的异步函数
+ * @param {number} maxRetries - 最大重试次数（默认2次，即最多执行3次）
+ * @param {number} delayMs - 重试间隔毫秒（默认1000ms）
+ * @returns {Promise} fn 的返回值
+ */
+async function withRetry(fn, maxRetries = 2, delayMs = 1000) {
+  for (let i = 0; i <= maxRetries; i++) {
+    try {
+      return await fn()
+    } catch (err) {
+      if (i === maxRetries) throw err
+      if (err.message && (err.message.includes('ETIMEDOUT') || err.message.includes('ECONNRESET') || err.message.includes('timeout'))) {
+        logWarn('autoDeduct', `网络错误，${delayMs}ms 后重试 (${i + 1}/${maxRetries})`, { error: err.message })
+        await new Promise(r => setTimeout(r, delayMs))
+        continue
+      }
+      throw err
+    }
+  }
+}
+
+/**
  * 云函数主入口
  *
  * @param {object} event - 定时触发器传入空对象 {}；手动触发可传 { year, month, day } 指定日期
@@ -75,6 +100,9 @@ exports.main = async (event, context) => {
   // 定时触发器没有用户上下文
   const openid = tryGetOpenID(cloud)
   const isManualTrigger = !!openid // 手动触发时有 OPENID
+
+  // 数据库预热（冷启动优化，减少首次查询超时）
+  await db.collection('courses').limit(1).get().catch(() => {})
 
   // 确定目标日期
   const targetDate = getTargetDate(event)
@@ -210,7 +238,7 @@ async function processSchedule(schedule, targetDate, targetDateStr, stats) {
   // ============================================================
   let locked
   try {
-    locked = await tryAcquireLockNonTx(db, courseId, scheduleId, targetDateStr)
+    locked = await withRetry(() => tryAcquireLockNonTx(db, courseId, scheduleId, targetDateStr))
   } catch (lockErr) {
     if (lockErr.message && lockErr.message.includes('E11000')) {
       locked = false
@@ -473,7 +501,16 @@ async function processSchedule(schedule, targetDate, targetDateStr, stats) {
       scheduleId,
       targetDateStr,
       `事务执行失败: ${err.message}`,
-      { deductionUnit, remainingHours: course.remainingHours }
+      {
+        deductionUnit,
+        remainingHours: course.remainingHours,
+        totalHours: course.totalHours,
+        consumedHours: course.consumedHours,
+        courseName: course.name,
+        courseStatus: course.status,
+        dayOfWeek: schedule.dayOfWeek,
+        time: schedule.time
+      }
     )
     stats.details.push({
       scheduleId,
