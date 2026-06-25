@@ -23,7 +23,7 @@ Component({
     'course'(course) {
       if (course) {
         const progressPercent = course.totalHours > 0
-          ? Math.round((course.consumedHours / course.totalHours) * 100)
+          ? Math.round((course.remainingHours / course.totalHours) * 100)
           : 0
         const statusLabel = COURSE_STATUS_LABELS[course.status] || course.status
         const subjectLabel = SUBJECT_LABELS[course.subject] || course.subject || ''

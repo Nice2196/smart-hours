@@ -58,10 +58,19 @@ Page({
         course._courseTypeLabel = COURSE_TYPE_LABELS[course.courseType] || course.courseType || ''
 
         // 对排课预计算星期标签
-        const schedules = (res.data.schedules || []).map(s => ({
-          ...s,
-          weekdayLabel: WEEKDAY_LABELS[s.dayOfWeek] || ''
-        }))
+        const schedules = (res.data.schedules || [])
+          .map(s => ({
+            ...s,
+            weekdayLabel: WEEKDAY_LABELS[s.dayOfWeek] || ''
+          }))
+          .sort((a, b) => {
+            // 按星期排序：周一(1) → 周日(0)，把周日排到最后
+            const orderA = a.dayOfWeek === 0 ? 7 : a.dayOfWeek
+            const orderB = b.dayOfWeek === 0 ? 7 : b.dayOfWeek
+            if (orderA !== orderB) return orderA - orderB
+            // 同一天按时间排序
+            return (a.time || '').localeCompare(b.time || '')
+          })
 
         this.setData({
           course,
