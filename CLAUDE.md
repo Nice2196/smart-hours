@@ -25,6 +25,36 @@
 
 始终使用 Python 3.11：`/usr/local/bin/python3.11`
 
+## Web 研究规则（必需遵循）
+
+当需要抓取网页内容或进行网络调研时，**优先使用 `web-research.sh` 脚本**，避免使用内置 WebFetch（存在域名安全验证问题）。
+
+### 使用方式
+
+```bash
+# 抓取单个 URL → Markdown
+~/.claude/scripts/web-research.sh "https://example.com"
+
+# 搜索网页 + 抓取内容
+~/.claude/scripts/web-research.sh --search "查询内容"
+
+# 限制搜索结果数量
+~/.claude/scripts/web-research.sh --search --limit 3 "查询内容"
+```
+
+### 工作流程
+
+1. **先用 WebSearch 搜索**（Claude 内置，走 Anthropic 服务器）
+2. **再用 web-research.sh 抓取**（Firecrawl API，国内可达，无需代理）
+3. **分析内容并回复用户**
+
+### 技术方案
+
+- 底层使用 Firecrawl API（`api.firecrawl.dev`）
+- 国内可直接访问，无需代理
+- 无需 API key（基础使用）
+- 返回干净的 Markdown 内容，token 最优
+
 ## Skills 研发全流程（必需遵循）
 
 本项目配置了 6 阶段研发流水线 Skills，编写/修改代码时**严格按以下流程**：
