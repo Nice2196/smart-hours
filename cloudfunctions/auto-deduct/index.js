@@ -120,6 +120,7 @@ exports.main = async (event, context) => {
     successfullyDeducted: 0,
     skipped: {
       locked: 0,           // 已加锁（幂等跳过）
+      notYetTime: 0,       // 排课时间未到
       courseInactive: 0,   // 课程状态不允许
       insufficientHours: 0, // 课时不足
       expired: 0,          // 已过期
@@ -210,7 +211,7 @@ exports.main = async (event, context) => {
     return {
       success: true,
       stats,
-      message: `处理完成: ${stats.successfullyDeducted} 成功, ${stats.skipped.locked} 幂等跳过, ${stats.skipped.errors} 失败`
+      message: `处理完成: ${stats.successfullyDeducted} 成功, ${stats.skipped.locked} 幂等跳过, ${stats.skipped.notYetTime} 时间未到, ${stats.skipped.errors} 失败`
     }
   } catch (err) {
     logError('autoDeduct', '自动消课主流程异常', err)
@@ -234,7 +235,32 @@ async function processSchedule(schedule, targetDate, targetDateStr, stats) {
   const { courseId, _id: scheduleId } = schedule
 
   // ============================================================
-  // 步骤3a：幂等锁检查（数据库级别原子操作）
+  // 步骤3a：校验排课时间是否已过
+  // ⚠️ 关键修复：定时触发器每小时执行，但排课可能在当天晚些时候。
+  //    必须检查当前北京时间是否已过排课时间，否则凌晨执行时
+  //    会提前创建幂等锁，导致真正到时间时被跳过。
+  // ============================================================
+  if (schedule.time) {
+    const now = new Date()
+    const beijingHour = (now.getUTCHours() + 8) % 24
+    const beijingMinute = now.getUTCMinutes()
+    const [schedHour, schedMinute] = schedule.time.split(':').map(Number)
+
+    // 当前北京时间还没到排课时间 → 跳过，等下次 cron 再处理
+    if (beijingHour < schedHour || (beijingHour === schedHour && beijingMinute < schedMinute)) {
+      stats.skipped.notYetTime = (stats.skipped.notYetTime || 0) + 1
+      stats.details.push({
+        scheduleId,
+        courseId,
+        status: 'skipped',
+        reason: `排课时间 ${schedule.time} 未到（当前 ${String(beijingHour).padStart(2, '0')}:${String(beijingMinute).padStart(2, '0')}）`
+      })
+      return
+    }
+  }
+
+  // ============================================================
+  // 步骤3b：幂等锁检查（数据库级别原子操作）
   // ============================================================
   let locked
   try {
